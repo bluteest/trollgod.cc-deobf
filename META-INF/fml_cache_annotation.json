@@ -1,0 +1,4816 @@
+{
+  "me/hollow/realth/JordoHack": {
+    "name": "me/hollow/realth/JordoHack",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/Mod;",
+        "target": "me/hollow/realth/JordoHack",
+        "values": {
+          "modid": {
+            "value": "jordohack"
+          },
+          "name": {
+            "value": "JordoHack"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/Loader": {
+    "name": "me/hollow/realth/api/mixin/Loader",
+    "interfaces": [
+      "net/minecraftforge/fml/relauncher/IFMLLoadingPlugin"
+    ],
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/relauncher/IFMLLoadingPlugin$MCVersion;",
+        "target": "me/hollow/realth/api/mixin/Loader",
+        "value": {
+          "value": "1.12.2"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/client/ITimer": {
+    "name": "me/hollow/realth/api/mixin/mixins/client/ITimer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/client/ITimer",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/util/Timer;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getTickLength()F",
+        "value": {
+          "value": "tickLength"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setTickLength(F)V",
+        "value": {
+          "value": "tickLength"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/client/MixinMinecraft": {
+    "name": "me/hollow/realth/api/mixin/mixins/client/MixinMinecraft",
+    "interfaces": [
+      "me/hollow/realth/api/mixin/accessors/IMinecraft"
+    ],
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/client/MixinMinecraft",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/Minecraft;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getTimer()Lnet/minecraft/util/Timer;",
+        "value": {
+          "value": "timer"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setRightClickDelayTimer(I)V"
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 50,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/client/entity/EntityPlayerSP;isHandActive()Z"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Redirect;",
+        "target": "handActiveRedirect(Lnet/minecraft/client/entity/EntityPlayerSP;)Z",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "50"
+          },
+          "method": {
+            "values": [
+              "sendClickBlockToController"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 51,
+        "values": {
+          "ordinal": {
+            "type": "INT",
+            "value": "0"
+          },
+          "shift": {
+            "type": "ENUM",
+            "value": "Lorg/spongepowered/asm/mixin/injection/At$Shift;/BEFORE"
+          },
+          "target": {
+            "value": "Lorg/lwjgl/input/Keyboard;getEventKey()I"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onKeyboard(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "51"
+            ]
+          },
+          "method": {
+            "values": [
+              "runTickKeyboard"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 52,
+        "values": {
+          "ordinal": {
+            "type": "INT",
+            "value": "0"
+          },
+          "shift": {
+            "type": "ENUM",
+            "value": "Lorg/spongepowered/asm/mixin/injection/At$Shift;/BEFORE"
+          },
+          "target": {
+            "value": "Lorg/lwjgl/input/Mouse;getEventButton()I"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "mouseClick(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "52"
+            ]
+          },
+          "method": {
+            "values": [
+              "runTickMouse"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 53,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "limitFps(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "53"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "getLimitFramerate"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 54,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "init(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "54"
+            ]
+          },
+          "method": {
+            "values": [
+              "init"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 55,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "shutdown(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "55"
+            ]
+          },
+          "method": {
+            "values": [
+              "shutdown"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 56,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onTick(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "56"
+            ]
+          },
+          "method": {
+            "values": [
+              "runTick"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 57,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onTickPost(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "57"
+            ]
+          },
+          "method": {
+            "values": [
+              "runTick"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/client/MixinPlayerControllerMP": {
+    "name": "me/hollow/realth/api/mixin/mixins/client/MixinPlayerControllerMP",
+    "interfaces": [
+      "me/hollow/realth/api/mixin/accessors/IPlayerControllerMP"
+    ],
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/client/MixinPlayerControllerMP",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/multiplayer/PlayerControllerMP;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setIsHittingBlock(Z)V",
+        "value": {
+          "value": "isHittingBlock"
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 44,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "clickBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "44"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "clickBlock"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 45,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/block/state/IBlockState;getPlayerRelativeBlockHardness(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Redirect;",
+        "target": "getPlayerRelativeBlockHardnessHook(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "45"
+          },
+          "method": {
+            "values": [
+              "onPlayerDamageBlock"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 46,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onPlayerDamageBlockHook(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "46"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "onPlayerDamageBlock"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 47,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/world/World;playEvent(ILnet/minecraft/util/math/BlockPos;I)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onPlayerDestroyBlock(Lnet/minecraft/util/math/BlockPos;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "47"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "onPlayerDestroyBlock"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/client/MixinWorld": {
+    "name": "me/hollow/realth/api/mixin/mixins/client/MixinWorld",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/client/MixinWorld",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/world/World;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 48,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/world/chunk/Chunk;getEntitiesOfTypeWithinAABB(Ljava/lang/Class;Lnet/minecraft/util/math/AxisAlignedBB;Ljava/util/List;Lcom/google/common/base/Predicate;)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Redirect;",
+        "target": "getEntitiesOfTypeWithinAABBHook(Lnet/minecraft/world/chunk/Chunk;Ljava/lang/Class;Lnet/minecraft/util/math/AxisAlignedBB;Ljava/util/List;Lcom/google/common/base/Predicate;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "48"
+          },
+          "method": {
+            "values": [
+              "getEntitiesWithinAABB(Ljava/lang/Class;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 49,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onEntityAdded(Lnet/minecraft/entity/Entity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "49"
+            ]
+          },
+          "method": {
+            "values": [
+              "onEntityAdded"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/ICPacketPlayer": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/ICPacketPlayer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/ICPacketPlayer",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/network/play/client/CPacketPlayer;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setYaw(F)V",
+        "value": {
+          "value": "yaw"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setX(D)V",
+        "value": {
+          "value": "x"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setY(D)V",
+        "value": {
+          "value": "y"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setZ(D)V",
+        "value": {
+          "value": "z"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setPitch(F)V",
+        "value": {
+          "value": "pitch"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/IEntity": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/IEntity",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/IEntity",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/entity/Entity;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getIsInWeb()Z",
+        "value": {
+          "value": "isInWeb"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/IEntityPlayerSP": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/IEntityPlayerSP",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/IEntityPlayerSP",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/entity/EntityPlayerSP;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "mm_setHandActive(Z)V",
+        "value": {
+          "value": "handActive"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setServerSneakState(Z)V",
+        "value": {
+          "value": "serverSneakState"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getServerSneakState()Z",
+        "value": {
+          "value": "serverSneakState"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setServerSprintState(Z)V",
+        "value": {
+          "value": "serverSprintState"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getServerSprintState()Z",
+        "value": {
+          "value": "serverSprintState"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setPrevOnGround(Z)V",
+        "value": {
+          "value": "prevOnGround"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getPrevOnGround()Z",
+        "value": {
+          "value": "prevOnGround"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setAutoJumpEnabled(Z)V",
+        "value": {
+          "value": "autoJumpEnabled"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getAutoJumpEnabled()Z",
+        "value": {
+          "value": "autoJumpEnabled"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setLastReportedPosX(D)V",
+        "value": {
+          "value": "lastReportedPosX"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getLastReportedPosX()D",
+        "value": {
+          "value": "lastReportedPosX"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setLastReportedPosY(D)V",
+        "value": {
+          "value": "lastReportedPosY"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getLastReportedPosY()D",
+        "value": {
+          "value": "lastReportedPosY"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setLastReportedPosZ(D)V",
+        "value": {
+          "value": "lastReportedPosZ"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getLastReportedPosZ()D",
+        "value": {
+          "value": "lastReportedPosZ"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setLastReportedYaw(F)V",
+        "value": {
+          "value": "lastReportedYaw"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getLastReportedYaw()F",
+        "value": {
+          "value": "lastReportedYaw"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setLastReportedPitch(F)V",
+        "value": {
+          "value": "lastReportedPitch"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getLastReportedPitch()F",
+        "value": {
+          "value": "lastReportedPitch"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setPositionUpdateTicks(I)V",
+        "value": {
+          "value": "positionUpdateTicks"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getPositionUpdateTicks()I",
+        "value": {
+          "value": "positionUpdateTicks"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Invoker;",
+        "target": "invokeOnUpdateWalkingPlayer()V",
+        "value": {
+          "value": "onUpdateWalkingPlayer"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/ISPacketEntityVelocity": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/ISPacketEntityVelocity",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/ISPacketEntityVelocity",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/network/play/server/SPacketEntityVelocity;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getEntityID()I",
+        "value": {
+          "value": "entityID"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getX()I",
+        "value": {
+          "value": "motionX"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setX(I)V",
+        "value": {
+          "value": "motionX"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getY()I",
+        "value": {
+          "value": "motionY"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setY(I)V",
+        "value": {
+          "value": "motionY"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getZ()I",
+        "value": {
+          "value": "motionZ"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setZ(I)V",
+        "value": {
+          "value": "motionZ"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/MixinEntity": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/MixinEntity",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ],
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/MixinEntity",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/entity/Entity;"
+          ]
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_145783_c"
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_70134_J"
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_70159_w"
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_70181_x"
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_70179_y"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "func_70091_d(Lnet/minecraft/entity/MoverType;DDD)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "func_145782_y()I"
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 59,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onTurnHook(FFLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "59"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "turn"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/MixinEntityPlayer": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/MixinEntityPlayer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/MixinEntityPlayer",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/entity/player/EntityPlayer;"
+          ]
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/MixinEntityPlayerSP": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/MixinEntityPlayerSP",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/MixinEntityPlayerSP",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/entity/EntityPlayerSP;"
+          ]
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_71159_c"
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 60,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onUpdatePre(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "60"
+            ]
+          },
+          "method": {
+            "values": [
+              "onUpdate"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 61,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onUpdatePost(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "61"
+            ]
+          },
+          "method": {
+            "values": [
+              "onUpdate"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 62,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "preMotion(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "62"
+            ]
+          },
+          "method": {
+            "values": [
+              "onUpdateWalkingPlayer"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 63,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "postMotion(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "63"
+            ]
+          },
+          "method": {
+            "values": [
+              "onUpdateWalkingPlayer"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/MixinLayerBipedArmor": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/MixinLayerBipedArmor",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/MixinLayerBipedArmor",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/entity/layers/LayerBipedArmor;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "func_177194_a(Lnet/minecraft/client/model/ModelBiped;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/Overwrite;",
+        "target": "func_188359_a(Lnet/minecraft/client/model/ModelBiped;Lnet/minecraft/inventory/EntityEquipmentSlot;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/MixinModelPlayer": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/MixinModelPlayer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/MixinModelPlayer",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/model/ModelPlayer;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 64,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "setRotationAngles(FFFFFFLnet/minecraft/entity/Entity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "64"
+            ]
+          },
+          "method": {
+            "values": [
+              "setRotationAngles"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/entity/MixinNetHandlerPlayClient": {
+    "name": "me/hollow/realth/api/mixin/mixins/entity/MixinNetHandlerPlayClient",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/entity/MixinNetHandlerPlayClient",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/network/NetHandlerPlayClient;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 58,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "handleEntityMetadataHook(Lnet/minecraft/network/play/server/SPacketEntityMetadata;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "58"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "handleEntityMetadata"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/gui/AccessorSPacketChat": {
+    "name": "me/hollow/realth/api/mixin/mixins/gui/AccessorSPacketChat",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/gui/AccessorSPacketChat",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/network/play/server/SPacketChat;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setChatComponent(Lnet/minecraft/util/text/ITextComponent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/gui/MixinGuiBossOverlay": {
+    "name": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiBossOverlay",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiBossOverlay",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/gui/GuiBossOverlay;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 83,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "render(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "83"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "renderBossHealth"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/gui/MixinGuiInGame": {
+    "name": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiInGame",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiInGame",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/gui/GuiIngame;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 79,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "renderPotionEffectsHook(Lnet/minecraft/client/gui/ScaledResolution;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "79"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "renderPotionEffects"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 80,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "renderScoreboardHook(Lnet/minecraft/scoreboard/ScoreObjective;Lnet/minecraft/client/gui/ScaledResolution;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "80"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "renderScoreboard"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/gui/MixinGuiNewChat": {
+    "name": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiNewChat",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiNewChat",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/gui/GuiNewChat;"
+          ]
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Final;",
+        "target": "field_146247_f"
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_146247_f"
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 85,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/client/gui/GuiNewChat;drawRect(IIIII)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Redirect;",
+        "target": "drawChatHook1(IIIII)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "85"
+          },
+          "method": {
+            "values": [
+              "drawChat"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 86,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/client/gui/FontRenderer;drawStringWithShadow(Ljava/lang/String;FFI)I"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Redirect;",
+        "target": "drawChatHook2(Lnet/minecraft/client/gui/FontRenderer;Ljava/lang/String;FFI)I",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "86"
+          },
+          "method": {
+            "values": [
+              "drawChat"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/gui/MixinGuiPlayerTabOverlay": {
+    "name": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiPlayerTabOverlay",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiPlayerTabOverlay",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/gui/GuiPlayerTabOverlay;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 81,
+        "values": {
+          "target": {
+            "value": "Ljava/util/List;subList(II)Ljava/util/List;"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Redirect;",
+        "target": "subListHook(Ljava/util/List;II)Ljava/util/List;",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "81"
+          },
+          "method": {
+            "values": [
+              "renderPlayerlist"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 82,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "getPlayerNameHook(Lnet/minecraft/client/network/NetworkPlayerInfo;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "82"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "getPlayerName"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/gui/MixinGuiScreen": {
+    "name": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiScreen",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/gui/MixinGuiScreen",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/gui/GuiScreen;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 84,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "renderToolTip(Lnet/minecraft/item/ItemStack;IILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "84"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "renderToolTip"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/network/ICPacketUseEntity": {
+    "name": "me/hollow/realth/api/mixin/mixins/network/ICPacketUseEntity",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/network/ICPacketUseEntity",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/network/play/client/CPacketUseEntity;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setEntityId(I)V",
+        "value": {
+          "value": "entityId"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setAction(Lnet/minecraft/network/play/client/CPacketUseEntity$Action;)V",
+        "value": {
+          "value": "action"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/network/ISPacketChat": {
+    "name": "me/hollow/realth/api/mixin/mixins/network/ISPacketChat",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/network/ISPacketChat",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/network/play/server/SPacketChat;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setChatComponent(Lnet/minecraft/util/text/ITextComponent;)V",
+        "value": {
+          "value": "chatComponent"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/network/MixinNetworkManager": {
+    "name": "me/hollow/realth/api/mixin/mixins/network/MixinNetworkManager",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/network/MixinNetworkManager",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/network/NetworkManager;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 76,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onSendPacket(Lnet/minecraft/network/Packet;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "76"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "sendPacket(Lnet/minecraft/network/Packet;)V"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 77,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onReceivePacket(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "77"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "channelRead0"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 78,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "closechanenl(Lnet/minecraft/util/text/ITextComponent;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "78"
+            ]
+          },
+          "method": {
+            "values": [
+              "closeChannel"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/IEntityRenderer": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/IEntityRenderer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/IEntityRenderer",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/EntityRenderer;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "setDrawBlockOutline(Z)V",
+        "value": {
+          "value": "drawBlockOutline"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Invoker;",
+        "target": "invokeOrientCamera(F)V",
+        "value": {
+          "value": "orientCamera"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/IRenderGlobal": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/IRenderGlobal",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/IRenderGlobal",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/RenderGlobal;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getDamagedBlocks()Ljava/util/Map;",
+        "value": {
+          "value": "damagedBlocks"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/IRenderManager": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/IRenderManager",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/IRenderManager",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/entity/RenderManager;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getRenderPosX()D",
+        "value": {
+          "value": "renderPosX"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getRenderPosY()D",
+        "value": {
+          "value": "renderPosY"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getRenderPosZ()D",
+        "value": {
+          "value": "renderPosZ"
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/MixinBlockRender": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/MixinBlockRender",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/MixinBlockRender",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/BlockModelRenderer;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 68,
+        "value": {
+          "value": "INVOKE"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "render(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/renderer/BufferBuilder;ZJLorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "68"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "renderModel(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/renderer/BufferBuilder;ZJ)Z"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/MixinEntityRenderer": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/MixinEntityRenderer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/MixinEntityRenderer",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/EntityRenderer;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 71,
+        "values": {
+          "target": {
+            "value": "net/minecraft/client/gui/GuiIngame.renderGameOverlay(F)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onRender2D(FJLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "71"
+            ]
+          },
+          "method": {
+            "values": [
+              "updateCameraAndRender"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 72,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/client/renderer/EntityRenderer;renderHand(FI)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onRender3D(IFJLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "72"
+            ]
+          },
+          "method": {
+            "values": [
+              "renderWorldPass"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 73,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "preDisplayItemActivation(Lnet/minecraft/item/ItemStack;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "73"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "displayItemActivation(Lnet/minecraft/item/ItemStack;)V"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 74,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "preRenderItemActivation(IIFLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "74"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "renderItemActivation(IIF)V"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 75,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "renderName(Lnet/minecraft/client/gui/FontRenderer;Ljava/lang/String;FFFIFFZZLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "75"
+            ]
+          },
+          "cancellable": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "method": {
+            "values": [
+              "drawNameplate"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/MixinRenderGlobal": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/MixinRenderGlobal",
+    "interfaces": [
+      "me/hollow/realth/api/mixin/mixins/render/IRenderGlobal"
+    ],
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/MixinRenderGlobal",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/RenderGlobal;"
+          ]
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/gen/Accessor;",
+        "target": "getDamagedBlocks()Ljava/util/Map;",
+        "value": {
+          "value": "damagedBlocks"
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 67,
+        "value": {
+          "value": "HEAD"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onSendingBlockBreakProgressPre(ILnet/minecraft/util/math/BlockPos;ILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "67"
+            ]
+          },
+          "method": {
+            "values": [
+              "sendBlockBreakProgress"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/MixinRenderItem": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/MixinRenderItem",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/MixinRenderItem",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/RenderItem;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 65,
+        "values": {
+          "target": {
+            "value": "net/minecraft/client/renderer/RenderItem.renderModel(Lnet/minecraft/client/renderer/block/model/IBakedModel;I)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/ModifyArg;",
+        "target": "renderEffect(I)I",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "value": "65"
+          },
+          "method": {
+            "values": [
+              "renderEffect"
+            ]
+          }
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 66,
+        "values": {
+          "target": {
+            "value": "Lnet/minecraft/client/renderer/RenderItem;renderItemModel(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V"
+          },
+          "value": {
+            "value": "INVOKE"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;ZLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "66"
+            ]
+          },
+          "method": {
+            "values": [
+              "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/MixinRenderLivingBase": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/MixinRenderLivingBase",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/MixinRenderLivingBase",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/entity/RenderLivingBase;"
+          ]
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lorg/spongepowered/asm/mixin/Shadow;",
+        "target": "field_77045_g"
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 70,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "renderLayers(Lnet/minecraft/entity/EntityLivingBase;FFFFFFFLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "70"
+            ]
+          },
+          "method": {
+            "values": [
+              "renderLayers"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/mixin/mixins/render/MixinRenderManager": {
+    "name": "me/hollow/realth/api/mixin/mixins/render/MixinRenderManager",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/Mixin;",
+        "target": "me/hollow/realth/api/mixin/mixins/render/MixinRenderManager",
+        "value": {
+          "type": "CLASS",
+          "values": [
+            "Lnet/minecraft/client/renderer/entity/RenderManager;"
+          ]
+        }
+      },
+      {
+        "type": "SUBTYPE",
+        "name": "Lorg/spongepowered/asm/mixin/injection/At;",
+        "id": 69,
+        "value": {
+          "value": "RETURN"
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lorg/spongepowered/asm/mixin/injection/Inject;",
+        "target": "onRenderEntity(Lnet/minecraft/entity/Entity;DDDFFZLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;Lnet/minecraft/client/renderer/entity/Render;)V",
+        "values": {
+          "at": {
+            "type": "ANNOTATION",
+            "values": [
+              "69"
+            ]
+          },
+          "locals": {
+            "type": "ENUM",
+            "value": "Lorg/spongepowered/asm/mixin/injection/callback/LocalCapture;/CAPTURE_FAILHARD"
+          },
+          "method": {
+            "values": [
+              "renderEntity"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/api/util/BlockPlaceUtil": {
+    "name": "me/hollow/realth/api/util/BlockPlaceUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/BlockUtil": {
+    "name": "me/hollow/realth/api/util/BlockUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/BurrowUtil": {
+    "name": "me/hollow/realth/api/util/BurrowUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/CombatUtil": {
+    "name": "me/hollow/realth/api/util/CombatUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/EntityUtil": {
+    "name": "me/hollow/realth/api/util/EntityUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/InventoryUtil": {
+    "name": "me/hollow/realth/api/util/InventoryUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/ItemUtil": {
+    "name": "me/hollow/realth/api/util/ItemUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/MathUtil": {
+    "name": "me/hollow/realth/api/util/MathUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/MessageUtil": {
+    "name": "me/hollow/realth/api/util/MessageUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/RenderUtil": {
+    "name": "me/hollow/realth/api/util/RenderUtil",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/api/util/RenderUtil2": {
+    "name": "me/hollow/realth/api/util/RenderUtil2",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/client/command/CommandManifest": {
+    "name": "me/hollow/realth/client/command/CommandManifest",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "me/hollow/realth/client/command/commands/BindCommand": {
+    "name": "me/hollow/realth/client/command/commands/BindCommand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/command/CommandManifest;",
+        "target": "me/hollow/realth/client/command/commands/BindCommand",
+        "values": {
+          "aliases": {
+            "values": [
+              "b"
+            ]
+          },
+          "label": {
+            "value": "Bind"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/command/commands/DrawnCommand": {
+    "name": "me/hollow/realth/client/command/commands/DrawnCommand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/command/CommandManifest;",
+        "target": "me/hollow/realth/client/command/commands/DrawnCommand",
+        "values": {
+          "aliases": {
+            "values": [
+              "Hide",
+              "d"
+            ]
+          },
+          "label": {
+            "value": "Drawn"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/command/commands/FriendCommand": {
+    "name": "me/hollow/realth/client/command/commands/FriendCommand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/command/CommandManifest;",
+        "target": "me/hollow/realth/client/command/commands/FriendCommand",
+        "values": {
+          "aliases": {
+            "values": [
+              "friends",
+              "friend"
+            ]
+          },
+          "label": {
+            "value": "Friend"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/command/commands/SaveCommand": {
+    "name": "me/hollow/realth/client/command/commands/SaveCommand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/command/CommandManifest;",
+        "target": "me/hollow/realth/client/command/commands/SaveCommand",
+        "values": {
+          "aliases": {
+            "values": [
+              "s"
+            ]
+          },
+          "label": {
+            "value": "Save"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/command/commands/ToggleCommand": {
+    "name": "me/hollow/realth/client/command/commands/ToggleCommand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/command/CommandManifest;",
+        "target": "me/hollow/realth/client/command/commands/ToggleCommand",
+        "values": {
+          "aliases": {
+            "values": [
+              "t"
+            ]
+          },
+          "label": {
+            "value": "Toggle"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/command/commands/TutorialCommand": {
+    "name": "me/hollow/realth/client/command/commands/TutorialCommand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/command/CommandManifest;",
+        "target": "me/hollow/realth/client/command/commands/TutorialCommand",
+        "values": {
+          "aliases": {
+            "values": [
+              "tut"
+            ]
+          },
+          "label": {
+            "value": "Tutorial"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/events/BlockEvent": {
+    "name": "me/hollow/realth/client/events/BlockEvent",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/Cancelable;",
+        "target": "me/hollow/realth/client/events/BlockEvent"
+      }
+    ]
+  },
+  "me/hollow/realth/client/events/ChatEvent": {
+    "name": "me/hollow/realth/client/events/ChatEvent",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/Cancelable;",
+        "target": "me/hollow/realth/client/events/ChatEvent"
+      }
+    ]
+  },
+  "me/hollow/realth/client/events/DamageBlockEvent": {
+    "name": "me/hollow/realth/client/events/DamageBlockEvent",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/Cancelable;",
+        "target": "me/hollow/realth/client/events/DamageBlockEvent"
+      }
+    ]
+  },
+  "me/hollow/realth/client/events/MoveEvent": {
+    "name": "me/hollow/realth/client/events/MoveEvent",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/Cancelable;",
+        "target": "me/hollow/realth/client/events/MoveEvent"
+      }
+    ]
+  },
+  "me/hollow/realth/client/events/PushEvent": {
+    "name": "me/hollow/realth/client/events/PushEvent",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/Cancelable;",
+        "target": "me/hollow/realth/client/events/PushEvent"
+      }
+    ]
+  },
+  "me/hollow/realth/client/events/TurnEvent": {
+    "name": "me/hollow/realth/client/events/TurnEvent",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/Cancelable;",
+        "target": "me/hollow/realth/client/events/TurnEvent"
+      }
+    ]
+  },
+  "me/hollow/realth/client/gui/components/Component": {
+    "name": "me/hollow/realth/client/gui/components/Component",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/client/gui/components/items/Item": {
+    "name": "me/hollow/realth/client/gui/components/items/Item",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/client/managers/CommandManager": {
+    "name": "me/hollow/realth/client/managers/CommandManager",
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onSendPacket(Lme/hollow/realth/client/events/PacketEvent$Send;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/managers/FontManager": {
+    "name": "me/hollow/realth/client/managers/FontManager",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/client/managers/InventoryManager": {
+    "name": "me/hollow/realth/client/managers/InventoryManager",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ]
+  },
+  "me/hollow/realth/client/managers/ModuleManager": {
+    "name": "me/hollow/realth/client/managers/ModuleManager",
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onKey(Lme/hollow/realth/client/events/KeyEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/managers/PopManager": {
+    "name": "me/hollow/realth/client/managers/PopManager",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ],
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/TickEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onPacket(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/managers/SafeManager": {
+    "name": "me/hollow/realth/client/managers/SafeManager",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ],
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/TickEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/managers/SpeedManager": {
+    "name": "me/hollow/realth/client/managers/SpeedManager",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ],
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/managers/TPSManager": {
+    "name": "me/hollow/realth/client/managers/TPSManager",
+    "interfaces": [
+      "me/hollow/realth/api/Util"
+    ],
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onPacketReceive(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "receivePacket(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/ModuleManifest": {
+    "name": "me/hollow/realth/client/modules/ModuleManifest",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "me/hollow/realth/client/modules/combat/AutoArmour": {
+    "name": "me/hollow/realth/client/modules/combat/AutoArmour",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/combat/AutoArmour",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "AutoArmour"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "playerUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/combat/Criticals": {
+    "name": "me/hollow/realth/client/modules/combat/Criticals",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/combat/Criticals",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "Criticals"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onPacket(Lme/hollow/realth/client/events/PacketEvent$Send;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/combat/HoleFiller": {
+    "name": "me/hollow/realth/client/modules/combat/HoleFiller",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/combat/HoleFiller",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "HoleFiller"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/combat/InstantFill": {
+    "name": "me/hollow/realth/client/modules/combat/InstantFill",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/combat/InstantFill",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "InstantFill"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/combat/Offhand": {
+    "name": "me/hollow/realth/client/modules/combat/Offhand",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/combat/Offhand",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "Offhand"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/combat/WallClip": {
+    "name": "me/hollow/realth/client/modules/combat/WallClip",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/combat/WallClip",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "PacketClip"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onMove(Lme/hollow/realth/client/events/MoveEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/Announcer": {
+    "name": "me/hollow/realth/client/modules/misc/Announcer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/Announcer",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "Announcer"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "true"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onTick()V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onEntityDeath(Lme/hollow/realth/client/events/DeathEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onAttackEntity(Lnet/minecraftforge/event/entity/player/AttackEntityEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onSendAttackPacket(Lme/hollow/realth/client/events/PacketEvent$Send;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onUseItem(Lnet/minecraftforge/event/entity/living/LivingEntityUseItemEvent$Finish;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onBreakBlock(Lme/hollow/realth/client/events/DamageBlockEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/AutoReply": {
+    "name": "me/hollow/realth/client/modules/misc/AutoReply",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/AutoReply",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "AutoReply"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onReceivePacket(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/ExtraTab": {
+    "name": "me/hollow/realth/client/modules/misc/ExtraTab",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/ExtraTab",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "ExtraTab"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/FPSLimit": {
+    "name": "me/hollow/realth/client/modules/misc/FPSLimit",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/FPSLimit",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "FPSLimit"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/MiddleClick": {
+    "name": "me/hollow/realth/client/modules/misc/MiddleClick",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/MiddleClick",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "MiddleClick"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/PopCounter": {
+    "name": "me/hollow/realth/client/modules/misc/PopCounter",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/PopCounter",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "PopCounter"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/misc/PvPInfo": {
+    "name": "me/hollow/realth/client/modules/misc/PvPInfo",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/misc/PvPInfo",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MISC"
+          },
+          "label": {
+            "value": "PvPInfo"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/movement/InstantSpeed": {
+    "name": "me/hollow/realth/client/modules/movement/InstantSpeed",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/movement/InstantSpeed",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MOVEMENT"
+          },
+          "label": {
+            "value": "InstantSpeed"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onMove(Lme/hollow/realth/client/events/MoveEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/movement/Speed": {
+    "name": "me/hollow/realth/client/modules/movement/Speed",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/movement/Speed",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MOVEMENT"
+          },
+          "label": {
+            "value": "Speed"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onMotion(Lme/hollow/realth/client/events/MoveEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/movement/Sprint": {
+    "name": "me/hollow/realth/client/modules/movement/Sprint",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/movement/Sprint",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MOVEMENT"
+          },
+          "label": {
+            "value": "Sprint"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onUpdate(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/movement/Step": {
+    "name": "me/hollow/realth/client/modules/movement/Step",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/movement/Step",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MOVEMENT"
+          },
+          "label": {
+            "value": "Step"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/movement/Velocity": {
+    "name": "me/hollow/realth/client/modules/movement/Velocity",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/movement/Velocity",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/MOVEMENT"
+          },
+          "label": {
+            "value": "Velocity"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onPacketReceive(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onPushOutOfBlocks(Lnet/minecraftforge/client/event/PlayerSPPushOutOfBlocksEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/other/Blocks": {
+    "name": "me/hollow/realth/client/modules/other/Blocks",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/other/Blocks",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/OTHER"
+          },
+          "enabled": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "label": {
+            "value": "Blocks"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/other/ClickGui": {
+    "name": "me/hollow/realth/client/modules/other/ClickGui",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/other/ClickGui",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/OTHER"
+          },
+          "key": {
+            "type": "INT",
+            "value": "157"
+          },
+          "label": {
+            "value": "ClickGui"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onTick(Lme/hollow/realth/client/events/TickEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/other/Colours": {
+    "name": "me/hollow/realth/client/modules/other/Colours",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/other/Colours",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/OTHER"
+          },
+          "enabled": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "label": {
+            "value": "Colours"
+          },
+          "persistent": {
+            "type": "BOOL",
+            "value": "true"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onTick(Lme/hollow/realth/client/events/TickEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onDisable()V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/other/HUD": {
+    "name": "me/hollow/realth/client/modules/other/HUD",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/other/HUD",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/OTHER"
+          },
+          "enabled": {
+            "type": "BOOL",
+            "value": "true"
+          },
+          "label": {
+            "value": "HUD"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/AutoCity": {
+    "name": "me/hollow/realth/client/modules/player/AutoCity",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/AutoCity",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "AutoCity"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/AutoFeetPlace": {
+    "name": "me/hollow/realth/client/modules/player/AutoFeetPlace",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/AutoFeetPlace",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/COMBAT"
+          },
+          "label": {
+            "value": "AutoFeetPlace"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/AutoStackFill": {
+    "name": "me/hollow/realth/client/modules/player/AutoStackFill",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/AutoStackFill",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "AutoStackFill"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/ChestSwap": {
+    "name": "me/hollow/realth/client/modules/player/ChestSwap",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/ChestSwap",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "ChestSwap"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onEnable()V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/FakePlayer": {
+    "name": "me/hollow/realth/client/modules/player/FakePlayer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/FakePlayer",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "FakePlayer"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/FastBreak": {
+    "name": "me/hollow/realth/client/modules/player/FastBreak",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/FastBreak",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "FastBreak"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onClickBlock(Lme/hollow/realth/client/events/ClickBlockEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/FastDrop": {
+    "name": "me/hollow/realth/client/modules/player/FastDrop",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/FastDrop",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "FastDrop"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/UpdateEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/player/FastPlace": {
+    "name": "me/hollow/realth/client/modules/player/FastPlace",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/player/FastPlace",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/PLAYER"
+          },
+          "label": {
+            "value": "FastPlace"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdate(Lme/hollow/realth/client/events/TickEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/BetterChat": {
+    "name": "me/hollow/realth/client/modules/render/BetterChat",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/BetterChat",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "BetterChat"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onPacketReceive(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/BlockHighlight": {
+    "name": "me/hollow/realth/client/modules/render/BlockHighlight",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/BlockHighlight",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "BlockHighlight"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/CustomFog": {
+    "name": "me/hollow/realth/client/modules/render/CustomFog",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/CustomFog",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "CustomFog"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "setFogColors(Lnet/minecraftforge/client/event/EntityViewRenderEvent$FogColors;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/EntityESP": {
+    "name": "me/hollow/realth/client/modules/render/EntityESP",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/EntityESP",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "EntityESP"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/Fullbright": {
+    "name": "me/hollow/realth/client/modules/render/Fullbright",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/Fullbright",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "Fullbright"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/GlintModify": {
+    "name": "me/hollow/realth/client/modules/render/GlintModify",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/GlintModify",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "GlintModify"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/HoleESP": {
+    "name": "me/hollow/realth/client/modules/render/HoleESP",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/HoleESP",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "HoleEsp"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onTick(Lme/hollow/realth/client/events/TickEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/HoleESPNew": {
+    "name": "me/hollow/realth/client/modules/render/HoleESPNew",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/HoleESPNew",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "HoleESP"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/InventoryViewer": {
+    "name": "me/hollow/realth/client/modules/render/InventoryViewer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/InventoryViewer",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "InventoryViewer"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/Nametags": {
+    "name": "me/hollow/realth/client/modules/render/Nametags",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/Nametags",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "Nametags"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/NoRender": {
+    "name": "me/hollow/realth/client/modules/render/NoRender",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/NoRender",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "NoRender"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onTick()V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/ShulkerViewer": {
+    "name": "me/hollow/realth/client/modules/render/ShulkerViewer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/ShulkerViewer",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "ShulkerViewer"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/Skeleton": {
+    "name": "me/hollow/realth/client/modules/render/Skeleton",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/Skeleton",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "Skeleton"
+          }
+        }
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/Starlink": {
+    "name": "me/hollow/realth/client/modules/render/Starlink",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/Starlink",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "Starlink"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onReceive(Lme/hollow/realth/client/events/PacketEvent$Receive;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onConnection(Lme/hollow/realth/client/events/ConnectionEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onTotemPop(Lme/hollow/realth/client/events/TotemPopEvent;)V"
+      }
+    ]
+  },
+  "me/hollow/realth/client/modules/render/ViewModel": {
+    "name": "me/hollow/realth/client/modules/render/ViewModel",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lme/hollow/realth/client/modules/ModuleManifest;",
+        "target": "me/hollow/realth/client/modules/render/ViewModel",
+        "values": {
+          "category": {
+            "type": "ENUM",
+            "value": "Lme/hollow/realth/client/modules/Module$Category;/RENDER"
+          },
+          "label": {
+            "value": "ViewModelChanger"
+          },
+          "listen": {
+            "type": "BOOL",
+            "value": "false"
+          }
+        }
+      }
+    ]
+  },
+  "net/b0at/api/event/EventHandler": {
+    "name": "net/b0at/api/event/EventHandler",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "net/b0at/api/event/EventManager": {
+    "name": "net/b0at/api/event/EventManager",
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/b0at/api/event/EventHandler;",
+        "target": "onUpdateWalkingPlayer(Lme/hollow/realth/client/events/UpdateWalkingPlayerEvent;)V"
+      }
+    ]
+  },
+  "net/b0at/api/event/EventManager$1": {
+    "name": "net/b0at/api/event/EventManager$1",
+    "interfaces": [
+      "net/b0at/api/event/profiler/IEventProfiler"
+    ]
+  },
+  "net/b0at/api/event/sorting/HandlerEncapsulatorSorter": {
+    "name": "net/b0at/api/event/sorting/HandlerEncapsulatorSorter",
+    "interfaces": [
+      "java/util/Comparator"
+    ]
+  },
+  "org/spongepowered/asm/bridge/RemapperAdapter": {
+    "name": "org/spongepowered/asm/bridge/RemapperAdapter",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/extensibility/IRemapper",
+      "org/spongepowered/asm/util/ObfuscationUtil$IClassRemapper"
+    ]
+  },
+  "org/spongepowered/asm/launch/MixinTweaker": {
+    "name": "org/spongepowered/asm/launch/MixinTweaker",
+    "interfaces": [
+      "net/minecraft/launchwrapper/ITweaker"
+    ]
+  },
+  "org/spongepowered/asm/launch/platform/MixinPlatformAgentAbstract": {
+    "name": "org/spongepowered/asm/launch/platform/MixinPlatformAgentAbstract",
+    "interfaces": [
+      "org/spongepowered/asm/launch/platform/IMixinPlatformAgent"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/InsnList$InsnListIterator": {
+    "name": "org/spongepowered/asm/lib/tree/InsnList$InsnListIterator",
+    "interfaces": [
+      "java/util/ListIterator"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/analysis/Analyzer": {
+    "name": "org/spongepowered/asm/lib/tree/analysis/Analyzer",
+    "interfaces": [
+      "org/spongepowered/asm/lib/Opcodes"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/analysis/BasicInterpreter": {
+    "name": "org/spongepowered/asm/lib/tree/analysis/BasicInterpreter",
+    "interfaces": [
+      "org/spongepowered/asm/lib/Opcodes"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/analysis/BasicValue": {
+    "name": "org/spongepowered/asm/lib/tree/analysis/BasicValue",
+    "interfaces": [
+      "org/spongepowered/asm/lib/tree/analysis/Value"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/analysis/SmallSet": {
+    "name": "org/spongepowered/asm/lib/tree/analysis/SmallSet",
+    "interfaces": [
+      "java/util/Iterator"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/analysis/SourceInterpreter": {
+    "name": "org/spongepowered/asm/lib/tree/analysis/SourceInterpreter",
+    "interfaces": [
+      "org/spongepowered/asm/lib/Opcodes"
+    ]
+  },
+  "org/spongepowered/asm/lib/tree/analysis/SourceValue": {
+    "name": "org/spongepowered/asm/lib/tree/analysis/SourceValue",
+    "interfaces": [
+      "org/spongepowered/asm/lib/tree/analysis/Value"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Debug": {
+    "name": "org/spongepowered/asm/mixin/Debug",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Dynamic": {
+    "name": "org/spongepowered/asm/mixin/Dynamic",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/EnvironmentStateTweaker": {
+    "name": "org/spongepowered/asm/mixin/EnvironmentStateTweaker",
+    "interfaces": [
+      "net/minecraft/launchwrapper/ITweaker"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Final": {
+    "name": "org/spongepowered/asm/mixin/Final",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Implements": {
+    "name": "org/spongepowered/asm/mixin/Implements",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Interface": {
+    "name": "org/spongepowered/asm/mixin/Interface",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Intrinsic": {
+    "name": "org/spongepowered/asm/mixin/Intrinsic",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Mixin": {
+    "name": "org/spongepowered/asm/mixin/Mixin",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/MixinEnvironment": {
+    "name": "org/spongepowered/asm/mixin/MixinEnvironment",
+    "interfaces": [
+      "org/spongepowered/asm/util/ITokenProvider"
+    ]
+  },
+  "org/spongepowered/asm/mixin/MixinEnvironment$TokenProviderWrapper": {
+    "name": "org/spongepowered/asm/mixin/MixinEnvironment$TokenProviderWrapper",
+    "interfaces": [
+      "java/lang/Comparable"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Mutable": {
+    "name": "org/spongepowered/asm/mixin/Mutable",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Overwrite": {
+    "name": "org/spongepowered/asm/mixin/Overwrite",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Pseudo": {
+    "name": "org/spongepowered/asm/mixin/Pseudo",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Shadow": {
+    "name": "org/spongepowered/asm/mixin/Shadow",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/SoftOverride": {
+    "name": "org/spongepowered/asm/mixin/SoftOverride",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/Unique": {
+    "name": "org/spongepowered/asm/mixin/Unique",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/gen/Accessor": {
+    "name": "org/spongepowered/asm/mixin/gen/Accessor",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/gen/Invoker": {
+    "name": "org/spongepowered/asm/mixin/gen/Invoker",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/At": {
+    "name": "org/spongepowered/asm/mixin/injection/At",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Coerce": {
+    "name": "org/spongepowered/asm/mixin/injection/Coerce",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Constant": {
+    "name": "org/spongepowered/asm/mixin/injection/Constant",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Group": {
+    "name": "org/spongepowered/asm/mixin/injection/Group",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Inject": {
+    "name": "org/spongepowered/asm/mixin/injection/Inject",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/InjectionPoint$AtCode": {
+    "name": "org/spongepowered/asm/mixin/injection/InjectionPoint$AtCode",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/ModifyArg": {
+    "name": "org/spongepowered/asm/mixin/injection/ModifyArg",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/ModifyArgs": {
+    "name": "org/spongepowered/asm/mixin/injection/ModifyArgs",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/ModifyConstant": {
+    "name": "org/spongepowered/asm/mixin/injection/ModifyConstant",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/ModifyVariable": {
+    "name": "org/spongepowered/asm/mixin/injection/ModifyVariable",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Redirect": {
+    "name": "org/spongepowered/asm/mixin/injection/Redirect",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Slice": {
+    "name": "org/spongepowered/asm/mixin/injection/Slice",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/Surrogate": {
+    "name": "org/spongepowered/asm/mixin/injection/Surrogate",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/callback/CallbackInfo": {
+    "name": "org/spongepowered/asm/mixin/injection/callback/CallbackInfo",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/injection/callback/Cancellable"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/code/ISliceContext": {
+    "name": "org/spongepowered/asm/mixin/injection/code/ISliceContext",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/injection/IInjectionPointContext"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/code/MethodSlice$InsnListSlice$SliceIterator": {
+    "name": "org/spongepowered/asm/mixin/injection/code/MethodSlice$InsnListSlice$SliceIterator",
+    "interfaces": [
+      "java/util/ListIterator"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/invoke/arg/ArgsClassGenerator": {
+    "name": "org/spongepowered/asm/mixin/injection/invoke/arg/ArgsClassGenerator",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IClassGenerator"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/modify/AfterStoreLocal": {
+    "name": "org/spongepowered/asm/mixin/injection/modify/AfterStoreLocal",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/modify/AfterStoreLocal",
+        "value": {
+          "value": "STORE"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/modify/BeforeLoadLocal": {
+    "name": "org/spongepowered/asm/mixin/injection/modify/BeforeLoadLocal",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/modify/BeforeLoadLocal",
+        "value": {
+          "value": "LOAD"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/modify/LocalVariableDiscriminator$Context": {
+    "name": "org/spongepowered/asm/mixin/injection/modify/LocalVariableDiscriminator$Context",
+    "interfaces": [
+      "org/spongepowered/asm/util/PrettyPrinter$IPrettyPrintable"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/AfterInvoke": {
+    "name": "org/spongepowered/asm/mixin/injection/points/AfterInvoke",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/AfterInvoke",
+        "value": {
+          "value": "INVOKE_ASSIGN"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeConstant": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeConstant",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeConstant",
+        "value": {
+          "value": "CONSTANT"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeFieldAccess": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeFieldAccess",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeFieldAccess",
+        "value": {
+          "value": "FIELD"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeFinalReturn": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeFinalReturn",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeFinalReturn",
+        "value": {
+          "value": "TAIL"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeInvoke": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeInvoke",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeInvoke",
+        "value": {
+          "value": "INVOKE"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeNew": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeNew",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeNew",
+        "value": {
+          "value": "NEW"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeReturn": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeReturn",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeReturn",
+        "value": {
+          "value": "RETURN"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/BeforeStringInvoke": {
+    "name": "org/spongepowered/asm/mixin/injection/points/BeforeStringInvoke",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/BeforeStringInvoke",
+        "value": {
+          "value": "INVOKE_STRING"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/JumpInsnPoint": {
+    "name": "org/spongepowered/asm/mixin/injection/points/JumpInsnPoint",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/JumpInsnPoint",
+        "value": {
+          "value": "JUMP"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/points/MethodHead": {
+    "name": "org/spongepowered/asm/mixin/injection/points/MethodHead",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lorg/spongepowered/asm/mixin/injection/InjectionPoint$AtCode;",
+        "target": "org/spongepowered/asm/mixin/injection/points/MethodHead",
+        "value": {
+          "value": "HEAD"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/struct/InjectionInfo": {
+    "name": "org/spongepowered/asm/mixin/injection/struct/InjectionInfo",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/injection/code/ISliceContext"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/struct/InjectionNodes$InjectionNode": {
+    "name": "org/spongepowered/asm/mixin/injection/struct/InjectionNodes$InjectionNode",
+    "interfaces": [
+      "java/lang/Comparable"
+    ]
+  },
+  "org/spongepowered/asm/mixin/injection/struct/Target": {
+    "name": "org/spongepowered/asm/mixin/injection/struct/Target",
+    "interfaces": [
+      "java/lang/Comparable",
+      "java/lang/Iterable"
+    ]
+  },
+  "org/spongepowered/asm/mixin/refmap/ReferenceMapper": {
+    "name": "org/spongepowered/asm/mixin/refmap/ReferenceMapper",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/refmap/IReferenceMapper",
+      "java/io/Serializable"
+    ]
+  },
+  "org/spongepowered/asm/mixin/refmap/RemappingReferenceMapper": {
+    "name": "org/spongepowered/asm/mixin/refmap/RemappingReferenceMapper",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/refmap/IReferenceMapper"
+    ]
+  },
+  "org/spongepowered/asm/mixin/refmap/RemappingReferenceMapper$1": {
+    "name": "org/spongepowered/asm/mixin/refmap/RemappingReferenceMapper$1",
+    "interfaces": [
+      "com/google/common/io/LineProcessor"
+    ]
+  },
+  "org/spongepowered/asm/mixin/struct/SpecialMethodInfo": {
+    "name": "org/spongepowered/asm/mixin/struct/SpecialMethodInfo",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/injection/IInjectionPointContext"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/InnerClassGenerator": {
+    "name": "org/spongepowered/asm/mixin/transformer/InnerClassGenerator",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IClassGenerator"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinConfig": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinConfig",
+    "interfaces": [
+      "java/lang/Comparable",
+      "org/spongepowered/asm/mixin/extensibility/IMixinConfig"
+    ],
+    "annotations": [
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "selector",
+        "value": {
+          "value": "target"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "version",
+        "value": {
+          "value": "minVersion"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "compatibility",
+        "value": {
+          "value": "compatibilityLevel"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "required",
+        "value": {
+          "value": "required"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "priority",
+        "value": {
+          "value": "priority"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "mixinPriority",
+        "value": {
+          "value": "mixinPriority"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "mixinPackage",
+        "value": {
+          "value": "package"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "mixinClasses",
+        "value": {
+          "value": "mixins"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "mixinClassesClient",
+        "value": {
+          "value": "client"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "mixinClassesServer",
+        "value": {
+          "value": "server"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "setSourceFile",
+        "value": {
+          "value": "setSourceFile"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "refMapperConfig",
+        "value": {
+          "value": "refmap"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "verboseLogging",
+        "value": {
+          "value": "verbose"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "pluginClassName",
+        "value": {
+          "value": "plugin"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "injectorOptions",
+        "value": {
+          "value": "injectors"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "overwriteOptions",
+        "value": {
+          "value": "overwrites"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinConfig$InjectorOptions": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinConfig$InjectorOptions",
+    "annotations": [
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "defaultRequireValue",
+        "value": {
+          "value": "defaultRequire"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "defaultGroup",
+        "value": {
+          "value": "defaultGroup"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "injectionPoints",
+        "value": {
+          "value": "injectionPoints"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "maxShiftBy",
+        "value": {
+          "value": "maxShiftBy"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinConfig$OverwriteOptions": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinConfig$OverwriteOptions",
+    "annotations": [
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "conformAccessModifiers",
+        "value": {
+          "value": "conformVisibility"
+        }
+      },
+      {
+        "type": "FIELD",
+        "name": "Lcom/google/gson/annotations/SerializedName;",
+        "target": "requireOverwriteAnnotations",
+        "value": {
+          "value": "requireAnnotations"
+        }
+      }
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinInfo": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinInfo",
+    "interfaces": [
+      "java/lang/Comparable",
+      "org/spongepowered/asm/mixin/extensibility/IMixinInfo"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinInfo$1": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinInfo$1",
+    "interfaces": [
+      "com/google/common/base/Function"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinInfo$2": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinInfo$2",
+    "interfaces": [
+      "com/google/common/base/Function"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinPostProcessor": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinPostProcessor",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/MixinConfig$IListener"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinTargetContext": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinTargetContext",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/refmap/IMixinContext"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/MixinTransformer$1": {
+    "name": "org/spongepowered/asm/mixin/transformer/MixinTransformer$1",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/MixinConfig$IListener"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/Proxy": {
+    "name": "org/spongepowered/asm/mixin/transformer/Proxy",
+    "interfaces": [
+      "net/minecraft/launchwrapper/IClassTransformer",
+      "org/spongepowered/asm/service/ILegacyClassTransformer"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/TargetClassContext": {
+    "name": "org/spongepowered/asm/mixin/transformer/TargetClassContext",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/ITargetClassContext"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/debug/RuntimeDecompiler": {
+    "name": "org/spongepowered/asm/mixin/transformer/debug/RuntimeDecompiler",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IDecompiler",
+      "org/jetbrains/java/decompiler/main/extern/IResultSaver"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/debug/RuntimeDecompiler$1": {
+    "name": "org/spongepowered/asm/mixin/transformer/debug/RuntimeDecompiler$1",
+    "interfaces": [
+      "org/jetbrains/java/decompiler/main/extern/IBytecodeProvider"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/debug/RuntimeDecompilerAsync": {
+    "name": "org/spongepowered/asm/mixin/transformer/debug/RuntimeDecompilerAsync",
+    "interfaces": [
+      "java/lang/Runnable",
+      "java/lang/Thread$UncaughtExceptionHandler"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/ext/extensions/ExtensionCheckClass": {
+    "name": "org/spongepowered/asm/mixin/transformer/ext/extensions/ExtensionCheckClass",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IExtension"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/ext/extensions/ExtensionCheckInterfaces": {
+    "name": "org/spongepowered/asm/mixin/transformer/ext/extensions/ExtensionCheckInterfaces",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IExtension"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/ext/extensions/ExtensionClassExporter": {
+    "name": "org/spongepowered/asm/mixin/transformer/ext/extensions/ExtensionClassExporter",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IExtension"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/meta/MixinInner": {
+    "name": "org/spongepowered/asm/mixin/transformer/meta/MixinInner",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/meta/MixinMerged": {
+    "name": "org/spongepowered/asm/mixin/transformer/meta/MixinMerged",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/mixin/transformer/meta/MixinRenamed": {
+    "name": "org/spongepowered/asm/mixin/transformer/meta/MixinRenamed",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "org/spongepowered/asm/obfuscation/RemapperChain": {
+    "name": "org/spongepowered/asm/obfuscation/RemapperChain",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/extensibility/IRemapper"
+    ]
+  },
+  "org/spongepowered/asm/obfuscation/mapping/common/MappingField": {
+    "name": "org/spongepowered/asm/obfuscation/mapping/common/MappingField",
+    "interfaces": [
+      "org/spongepowered/asm/obfuscation/mapping/IMapping"
+    ]
+  },
+  "org/spongepowered/asm/obfuscation/mapping/common/MappingMethod": {
+    "name": "org/spongepowered/asm/obfuscation/mapping/common/MappingMethod",
+    "interfaces": [
+      "org/spongepowered/asm/obfuscation/mapping/IMapping"
+    ]
+  },
+  "org/spongepowered/asm/service/ILegacyClassTransformer": {
+    "name": "org/spongepowered/asm/service/ILegacyClassTransformer",
+    "interfaces": [
+      "org/spongepowered/asm/service/ITransformer"
+    ]
+  },
+  "org/spongepowered/asm/service/mojang/Blackboard": {
+    "name": "org/spongepowered/asm/service/mojang/Blackboard",
+    "interfaces": [
+      "org/spongepowered/asm/service/IGlobalPropertyService"
+    ]
+  },
+  "org/spongepowered/asm/service/mojang/LegacyTransformerHandle": {
+    "name": "org/spongepowered/asm/service/mojang/LegacyTransformerHandle",
+    "interfaces": [
+      "org/spongepowered/asm/service/ILegacyClassTransformer"
+    ]
+  },
+  "org/spongepowered/asm/service/mojang/MixinServiceLaunchWrapper": {
+    "name": "org/spongepowered/asm/service/mojang/MixinServiceLaunchWrapper",
+    "interfaces": [
+      "org/spongepowered/asm/service/IMixinService",
+      "org/spongepowered/asm/service/IClassProvider",
+      "org/spongepowered/asm/service/IClassBytecodeProvider"
+    ]
+  },
+  "org/spongepowered/asm/service/mojang/MixinServiceLaunchWrapperBootstrap": {
+    "name": "org/spongepowered/asm/service/mojang/MixinServiceLaunchWrapperBootstrap",
+    "interfaces": [
+      "org/spongepowered/asm/service/IMixinServiceBootstrap"
+    ]
+  },
+  "org/spongepowered/asm/transformers/TreeTransformer": {
+    "name": "org/spongepowered/asm/transformers/TreeTransformer",
+    "interfaces": [
+      "org/spongepowered/asm/service/ILegacyClassTransformer"
+    ]
+  },
+  "org/spongepowered/asm/util/Annotations$1": {
+    "name": "org/spongepowered/asm/util/Annotations$1",
+    "interfaces": [
+      "com/google/common/base/Function"
+    ]
+  },
+  "org/spongepowered/asm/util/ClassSignature$Token": {
+    "name": "org/spongepowered/asm/util/ClassSignature$Token",
+    "interfaces": [
+      "org/spongepowered/asm/util/ClassSignature$IToken"
+    ]
+  },
+  "org/spongepowered/asm/util/ClassSignature$TokenHandle": {
+    "name": "org/spongepowered/asm/util/ClassSignature$TokenHandle",
+    "interfaces": [
+      "org/spongepowered/asm/util/ClassSignature$IToken"
+    ]
+  },
+  "org/spongepowered/asm/util/ClassSignature$TypeVar": {
+    "name": "org/spongepowered/asm/util/ClassSignature$TypeVar",
+    "interfaces": [
+      "java/lang/Comparable"
+    ]
+  },
+  "org/spongepowered/asm/util/PrettyPrinter$HorizontalRule": {
+    "name": "org/spongepowered/asm/util/PrettyPrinter$HorizontalRule",
+    "interfaces": [
+      "org/spongepowered/asm/util/PrettyPrinter$ISpecialEntry"
+    ]
+  },
+  "org/spongepowered/asm/util/PrettyPrinter$KeyValue": {
+    "name": "org/spongepowered/asm/util/PrettyPrinter$KeyValue",
+    "interfaces": [
+      "org/spongepowered/asm/util/PrettyPrinter$IVariableWidthEntry"
+    ]
+  },
+  "org/spongepowered/asm/util/PrettyPrinter$Row": {
+    "name": "org/spongepowered/asm/util/PrettyPrinter$Row",
+    "interfaces": [
+      "org/spongepowered/asm/util/PrettyPrinter$IVariableWidthEntry"
+    ]
+  },
+  "org/spongepowered/asm/util/PrettyPrinter$Table": {
+    "name": "org/spongepowered/asm/util/PrettyPrinter$Table",
+    "interfaces": [
+      "org/spongepowered/asm/util/PrettyPrinter$IVariableWidthEntry"
+    ]
+  },
+  "org/spongepowered/asm/util/VersionNumber": {
+    "name": "org/spongepowered/asm/util/VersionNumber",
+    "interfaces": [
+      "java/lang/Comparable",
+      "java/io/Serializable"
+    ]
+  },
+  "org/spongepowered/tools/agent/MixinAgent": {
+    "name": "org/spongepowered/tools/agent/MixinAgent",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/transformer/ext/IHotSwap"
+    ]
+  },
+  "org/spongepowered/tools/agent/MixinAgent$Transformer": {
+    "name": "org/spongepowered/tools/agent/MixinAgent$Transformer",
+    "interfaces": [
+      "java/lang/instrument/ClassFileTransformer"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/AnnotatedMixinElementHandlerAccessor": {
+    "name": "org/spongepowered/tools/obfuscation/AnnotatedMixinElementHandlerAccessor",
+    "interfaces": [
+      "org/spongepowered/asm/mixin/refmap/IMixinContext"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/AnnotatedMixins": {
+    "name": "org/spongepowered/tools/obfuscation/AnnotatedMixins",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/interfaces/IMixinAnnotationProcessor",
+      "org/spongepowered/asm/util/ITokenProvider",
+      "org/spongepowered/tools/obfuscation/interfaces/ITypeHandleProvider",
+      "org/spongepowered/tools/obfuscation/interfaces/IJavadocProvider"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/Mappings": {
+    "name": "org/spongepowered/tools/obfuscation/Mappings",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/mapping/IMappingConsumer"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/Mappings$UniqueMappings": {
+    "name": "org/spongepowered/tools/obfuscation/Mappings$UniqueMappings",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/mapping/IMappingConsumer"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/MixinValidator": {
+    "name": "org/spongepowered/tools/obfuscation/MixinValidator",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/interfaces/IMixinValidator"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/ObfuscationData": {
+    "name": "org/spongepowered/tools/obfuscation/ObfuscationData",
+    "interfaces": [
+      "java/lang/Iterable"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/ObfuscationDataProvider": {
+    "name": "org/spongepowered/tools/obfuscation/ObfuscationDataProvider",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/interfaces/IObfuscationDataProvider"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/ObfuscationEnvironment": {
+    "name": "org/spongepowered/tools/obfuscation/ObfuscationEnvironment",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/interfaces/IObfuscationEnvironment"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/ObfuscationEnvironment$RemapperProxy": {
+    "name": "org/spongepowered/tools/obfuscation/ObfuscationEnvironment$RemapperProxy",
+    "interfaces": [
+      "org/spongepowered/asm/util/ObfuscationUtil$IClassRemapper"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/ObfuscationManager": {
+    "name": "org/spongepowered/tools/obfuscation/ObfuscationManager",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/interfaces/IObfuscationManager"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/ReferenceManager": {
+    "name": "org/spongepowered/tools/obfuscation/ReferenceManager",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/interfaces/IReferenceManager"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/interfaces/IMixinAnnotationProcessor": {
+    "name": "org/spongepowered/tools/obfuscation/interfaces/IMixinAnnotationProcessor",
+    "interfaces": [
+      "javax/annotation/processing/Messager",
+      "org/spongepowered/tools/obfuscation/interfaces/IOptionProvider"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/mapping/common/MappingProvider": {
+    "name": "org/spongepowered/tools/obfuscation/mapping/common/MappingProvider",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/mapping/IMappingProvider"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/mapping/common/MappingWriter": {
+    "name": "org/spongepowered/tools/obfuscation/mapping/common/MappingWriter",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/mapping/IMappingWriter"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/mapping/mcp/MappingProviderSrg$1": {
+    "name": "org/spongepowered/tools/obfuscation/mapping/mcp/MappingProviderSrg$1",
+    "interfaces": [
+      "com/google/common/io/LineProcessor"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/mcp/ObfuscationServiceMCP": {
+    "name": "org/spongepowered/tools/obfuscation/mcp/ObfuscationServiceMCP",
+    "interfaces": [
+      "org/spongepowered/tools/obfuscation/service/IObfuscationService"
+    ]
+  },
+  "org/spongepowered/tools/obfuscation/mirror/TypeReference": {
+    "name": "org/spongepowered/tools/obfuscation/mirror/TypeReference",
+    "interfaces": [
+      "java/io/Serializable",
+      "java/lang/Comparable"
+    ]
+  }
+}

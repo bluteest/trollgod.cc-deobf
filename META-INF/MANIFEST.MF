@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+TweakOrder: 0
+MixinConfigs: mixins.realth.json
+FMLCorePluginContainsFMLMod: true
+FMLAT: trollgod_at.cfg
+TweakClass: org.spongepowered.asm.launch.MixinTweaker
+ForceLoadAsMod: true
+FMLCorePlugin: me.hollow.realth.api.mixin.Loader
+

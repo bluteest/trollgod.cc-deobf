@@ -1,0 +1,11 @@
+[
+  {
+    "modid": "trollgod",
+    "name": "troll_god.pl",
+    "description": "trollgod continuation",
+    "version": "2.0",
+    "mcversion": "1.12.2",
+    "authorList": "lyric, vasler",
+    "credits": "hollow for the worst base known to man"
+  }
+]
