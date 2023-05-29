@@ -1,28 +1,26 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.play.other.CPacketPlayer
+ */
 package me.hollow.realth.api.mixin.mixins.entity;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.network.play.client.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.network.play.client.CPacketPlayer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ CPacketPlayer.class })
-public interface ICPacketPlayer
-{
-    @Accessor("yaw")
-    void setYaw(final float p0);
-    
-    @Accessor("x")
-    void setX(final double p0);
-    
-    @Accessor("y")
-    void setY(final double p0);
-    
-    @Accessor("z")
-    void setZ(final double p0);
-    
-    @Accessor("pitch")
-    void setPitch(final float p0);
+@Mixin(value={CPacketPlayer.class})
+public interface ICPacketPlayer {
+    @Accessor(value="yaw")
+    public void setYaw(float var1);
+    @Accessor(value = "x")void setX(double x);
+
+    @Accessor(value = "y")void setY(double y);
+
+    @Accessor(value = "z")void setZ(double z);
+
+    @Accessor(value="pitch")
+    public void setPitch(float var1);
 }
+

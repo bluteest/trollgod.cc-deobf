@@ -1,52 +1,70 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\lun\Documents\Minecraft-Deobfuscator3000-1.2.3\1.12 stable mappings"!
 
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.realmsclient.gui.ChatFormatting
+ *  net.minecraft.other.audio.ISound
+ *  net.minecraft.other.audio.PositionedSoundRecord
+ *  net.minecraft.init.SoundEvents
+ *  net.minecraft.util.SoundEvent
+ */
 package me.hollow.realth.client.gui.components.items.buttons;
 
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.api.util.*;
-import me.hollow.realth.*;
-import com.mojang.realmsclient.gui.*;
-import me.hollow.realth.client.gui.*;
-import net.minecraft.init.*;
-import net.minecraft.client.audio.*;
+import com.mojang.realmsclient.gui.ChatFormatting;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.RenderUtil;
+import me.hollow.realth.client.gui.TrollGui;
+import me.hollow.realth.client.gui.components.items.buttons.Button;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.SoundEvent;
 
-public class EnumButton extends Button
-{
+public class EnumButton
+extends Button {
     public final Setting setting;
-    
-    public EnumButton(final Setting setting) {
+
+    public EnumButton(Setting setting) {
         super(setting.getName());
         this.setting = setting;
         this.width = 15;
     }
-    
-    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
-        RenderUtil.drawRect(this.x, this.y, this.x + this.width + 7.4f, this.y + this.height - 0.5f, this.getColor(this.getState()));
-        JordoHack.fontManager.drawString(this.setting.getName() + " " + ChatFormatting.GRAY + this.setting.currentEnumName(), this.x + 2.3f, this.y - 1.7f - TrollGui.getClickGui().getTextOffset(), this.getState() ? -1 : -5592406);
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        RenderUtil.drawRect(this.x, this.y, this.x + (float)this.width + 7.4f, this.y + (float)this.height - 0.5f, this.getColor(this.getState()));
+        JordoHack.fontManager.drawString(this.setting.getName() + " " + (Object)ChatFormatting.GRAY + this.setting.currentEnumName(), this.x + 2.3f, this.y - 1.7f - (float)TrollGui.getClickGui().getTextOffset(), this.getState() ? -1 : -5592406, false);
     }
-    
+
+    @Override
     public void update() {
         this.setHidden(!this.setting.isVisible());
     }
-    
-    public void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) {
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if (this.isHovering(mouseX, mouseY)) {
-            EnumButton.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord((SoundEvent)SoundEvents.UI_BUTTON_CLICK, (float)1.0f));
         }
     }
-    
+
+    @Override
     public int getHeight() {
         return 14;
     }
-    
+
+    @Override
     public void toggle() {
         this.setting.increaseEnum();
     }
-    
+
+    @Override
     public boolean getState() {
         return true;
     }
 }
+

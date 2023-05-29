@@ -1,15 +1,18 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.command;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Retention(value=RetentionPolicy.RUNTIME)
+@Target(value={ElementType.TYPE})
 public @interface CommandManifest {
-    String label();
-    
-    String[] aliases() default {};
+    public String label();
+
+    public String[] aliases() default {};
 }
+

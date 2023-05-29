@@ -1,86 +1,83 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.player;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import net.minecraft.util.math.*;
-import me.hollow.realth.*;
-import java.awt.*;
-import me.hollow.realth.client.events.*;
-import net.minecraft.init.*;
-import me.hollow.realth.api.util.*;
-import net.minecraft.network.*;
-import me.hollow.realth.api.mixin.accessors.*;
-import net.minecraft.util.*;
-import net.minecraft.network.play.client.*;
-import net.b0at.api.event.*;
-import net.minecraft.world.*;
-import net.minecraft.block.*;
+import java.awt.Color;
 
-@ModuleManifest(label = "FastBreak", category = Module.Category.PLAYER)
-public class FastBreak extends Module
-{
-    private final Setting<Boolean> reset;
-    private final Setting<Boolean> silent;
-    private static FastBreak INSTANCE;
-    private BlockPos currentPos;
-    private final Timer renderTimer;
-    
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.mixin.accessors.IPlayerControllerMP;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.RenderUtil;
+import me.hollow.realth.api.util.Timer;
+import me.hollow.realth.api.util.ItemUtil;
+import me.hollow.realth.client.events.ClickBlockEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketHeldItemChange;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+
+@ModuleManifest(label="FastBreak", category=Module.Category.PLAYER)
+public class FastBreak
+        extends Module {
+    private final Setting<Boolean> reset = this.register(new Setting<Boolean>("Reset", true));
+    private final Setting<Boolean> silent = this.register(new Setting<Boolean>("Silent", true));
+    private static FastBreak INSTANCE = new FastBreak();
+    private BlockPos currentPos = null;
+
+    private final Timer renderTimer = new Timer();
+
     public FastBreak() {
-        this.reset = (Setting<Boolean>)this.register(new Setting("Reset", (Object)true));
-        this.silent = (Setting<Boolean>)this.register(new Setting("Silent", (Object)true));
-        this.currentPos = null;
-        this.renderTimer = new Timer();
-        FastBreak.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     public static FastBreak getInstance() {
-        if (FastBreak.INSTANCE == null) {
-            FastBreak.INSTANCE = new FastBreak();
+        if (INSTANCE == null) {
+            INSTANCE = new FastBreak();
         }
-        return FastBreak.INSTANCE;
+        return INSTANCE;
     }
-    
+
+    @Override
     public void onRender3D() {
-        if (this.currentPos != null && FastBreak.mc.world.getBlockState(this.currentPos).getBlock() == Blocks.AIR) {
-            this.currentPos = null;
+        if (currentPos != null && mc.world.getBlockState(currentPos).getBlock() == Blocks.AIR) {
+            currentPos = null;
         }
+
         if (this.currentPos != null) {
-            final Color color = new Color(this.renderTimer.hasReached((long)(int)(1500.0f * JordoHack.INSTANCE.getTpsManager().getTpsFactor())) ? 16711680 : 65280);
-            RenderUtil.drawProperBoxESP(this.currentPos, color, 1.0f, true, true, 40, 1.0f);
+            Color color = new Color(this.renderTimer.hasReached((int) (1500.0f * JordoHack.INSTANCE.getTpsManager().getTpsFactor())) ? 0xFF0000 : 0x00FF00);
+            RenderUtil.drawProperBoxESP(currentPos, color, 1, true, true, 40, 1);
         }
     }
-    
+
     @EventHandler
-    public void onClickBlock(final ClickBlockEvent event) {
-        final int realSlot = FastBreak.mc.player.inventory.currentItem;
-        if (this.silent.getValue()) {
-            FastBreak.mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(ItemUtil.getItemSlotInHotbar(Items.DIAMOND_PICKAXE)));
+    public void onClickBlock(ClickBlockEvent event) {
+        int realSlot = mc.player.inventory.currentItem;
+        if (silent.getValue().booleanValue()) {
+            mc.getConnection().sendPacket(new CPacketHeldItemChange(ItemUtil.getItemSlotInHotbar(Items.DIAMOND_PICKAXE)));
         }
-        if (this.reset.getValue()) {
-            ((IPlayerControllerMP)FastBreak.mc.playerController).setIsHittingBlock(false);
+        if (this.reset.getValue().booleanValue()) {
+            ((IPlayerControllerMP) this.mc.playerController).setIsHittingBlock(false);
         }
         if (this.canBreak(event.getPos())) {
-            FastBreak.mc.player.swingArm(EnumHand.MAIN_HAND);
-            FastBreak.mc.getConnection().sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, event.getPos(), event.getFacing()));
-            FastBreak.mc.getConnection().sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, event.getPos(), event.getFacing()));
-            if (this.silent.getValue()) {
-                FastBreak.mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(realSlot));
+            this.mc.player.swingArm(EnumHand.MAIN_HAND);
+            this.mc.getConnection().sendPacket((Packet) new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, event.getPos(), event.getFacing()));
+            this.mc.getConnection().sendPacket((Packet) new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, event.getPos(), event.getFacing()));
+            if (silent.getValue().booleanValue()) {
+                mc.getConnection().sendPacket(new CPacketHeldItemChange(realSlot));
             }
             this.currentPos = event.getPos();
         }
         event.cancel();
     }
-    
-    public boolean canBreak(final BlockPos pos) {
-        final Block block = FastBreak.mc.world.getBlockState(pos).getBlock();
-        return block.getBlockHardness(FastBreak.mc.world.getBlockState(pos), (World)FastBreak.mc.world, pos) != -1.0f;
-    }
-    
-    static {
-        FastBreak.INSTANCE = new FastBreak();
+
+    public boolean canBreak (BlockPos pos){
+        Block block = this.mc.world.getBlockState(pos).getBlock();
+        return block.getBlockHardness(this.mc.world.getBlockState(pos), (World) this.mc.world, pos) != -1.0f;
     }
 }

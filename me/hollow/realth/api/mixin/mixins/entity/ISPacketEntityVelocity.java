@@ -1,34 +1,30 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.api.mixin.mixins.entity;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.network.play.server.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.network.play.server.SPacketEntityVelocity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ SPacketEntityVelocity.class })
-public interface ISPacketEntityVelocity
-{
-    @Accessor("entityID")
+@Mixin(SPacketEntityVelocity.class)
+public interface ISPacketEntityVelocity {
+
+    @Accessor(value = "entityID")
     int getEntityID();
-    
-    @Accessor("motionX")
+
+    @Accessor(value = "motionX")
     int getX();
-    
-    @Accessor("motionX")
-    void setX(final int p0);
-    
-    @Accessor("motionY")
+
+    @Accessor(value = "motionX")
+    void setX(int motionX);
+
+    @Accessor(value = "motionY")
     int getY();
-    
-    @Accessor("motionY")
-    void setY(final int p0);
-    
-    @Accessor("motionZ")
+
+    @Accessor(value = "motionY")
+    void setY(int motionY);
+
+    @Accessor(value = "motionZ")
     int getZ();
-    
-    @Accessor("motionZ")
-    void setZ(final int p0);
+
+    @Accessor(value = "motionZ")
+    void setZ(int motionZ);
 }

@@ -1,30 +1,26 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.api.mixin.mixins.entity;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.client.network.*;
-import net.minecraft.network.play.server.*;
-import org.spongepowered.asm.mixin.injection.callback.*;
-import me.hollow.realth.api.*;
-import net.minecraft.entity.player.*;
-import me.hollow.realth.client.events.*;
-import me.hollow.realth.*;
-import net.minecraft.entity.*;
-import org.spongepowered.asm.mixin.injection.*;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.client.events.DeathEvent;
+import me.hollow.realth.api.Util;
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.server.SPacketEntityMetadata;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({ NetHandlerPlayClient.class })
-public class MixinNetHandlerPlayClient
-{
-    @Inject(method = { "handleEntityMetadata" }, at = { @At("RETURN") }, cancellable = true)
-    private void handleEntityMetadataHook(final SPacketEntityMetadata packetIn, final CallbackInfo info) {
-        final Entity entity;
-        final EntityPlayer player;
+@Mixin(value={NetHandlerPlayClient.class})
+public class MixinNetHandlerPlayClient {
+    @Inject(method={"handleEntityMetadata"}, at={@At(value="RETURN")}, cancellable=true)
+    private void handleEntityMetadataHook(SPacketEntityMetadata packetIn, CallbackInfo info) {
+        EntityPlayer player;
+        Entity entity;
         if (Util.mc.world != null && (entity = Util.mc.world.getEntityByID(packetIn.getEntityId())) instanceof EntityPlayer && (player = (EntityPlayer)entity).getHealth() <= 0.0f) {
-            final DeathEvent event = new DeathEvent(player);
-            JordoHack.INSTANCE.getEventManager().fireEvent((Object)event);
+            DeathEvent event = new DeathEvent(player);
+            JordoHack.INSTANCE.getEventManager().fireEvent(event);
         }
     }
 }

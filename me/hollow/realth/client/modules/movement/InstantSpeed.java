@@ -1,36 +1,33 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.movement;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.client.events.*;
-import me.hollow.realth.api.util.*;
-import net.b0at.api.event.*;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.client.events.MoveEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.EntityUtil;
+import me.hollow.realth.api.util.MovementUtil;
+import net.b0at.api.event.EventHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
 
 @ModuleManifest(label = "InstantSpeed", category = Module.Category.MOVEMENT)
-public class InstantSpeed extends Module
-{
-    Setting<Boolean> noLiquid;
-    
-    public InstantSpeed() {
-        this.noLiquid = (Setting<Boolean>)this.register(new Setting("NoLiquid", (Object)true));
-    }
-    
+public class InstantSpeed
+        extends Module {
+    Setting<Boolean> noLiquid = this.register(new Setting<Boolean>("NoLiquid", true));
+    @Override
     public void onToggle() {
         if (fullNullCheck()) {
             return;
         }
     }
-    
+
     @EventHandler
-    public void onMove(final MoveEvent e) {
-        if (this.isDisabled() || InstantSpeed.mc.player.isElytraFlying()) {
+    public void onMove(MoveEvent e) {
+        if (this.isDisabled() || mc.player.isElytraFlying()) {
             return;
         }
-        if (((boolean)this.noLiquid.getValue() && EntityUtil.isInLiquid()) || InstantSpeed.mc.player.capabilities.isFlying) {
+        if (this.noLiquid.getValue() && EntityUtil.isInLiquid() || mc.player.capabilities.isFlying) {
             return;
         }
         MovementUtil.strafe(e, MovementUtil.getSpeed());

@@ -1,191 +1,177 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.player;
 
-import me.hollow.realth.client.modules.*;
-import net.minecraft.client.*;
-import me.hollow.realth.api.property.*;
-import net.minecraft.entity.*;
-import me.hollow.realth.*;
-import net.minecraft.client.network.*;
-import java.util.*;
-import net.minecraft.network.play.client.*;
-import net.minecraft.network.*;
-import me.hollow.realth.client.events.*;
-import net.b0at.api.event.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.util.math.*;
-import net.minecraft.init.*;
-import net.minecraft.item.*;
+import me.hollow.realth.JordoHack;
 import me.hollow.realth.api.util.*;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.client.events.UpdateEvent;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.network.play.client.CPacketHeldItemChange;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ModuleManifest(label = "AutoFeetPlace", category = Module.Category.COMBAT)
-public class AutoFeetPlace extends Module
-{
-    Minecraft mc;
-    public Setting<Integer> delay;
-    public Setting<Float> offset;
-    public Setting<Boolean> floor;
-    public Setting<Boolean> smartHelper;
-    public Setting<Boolean> antiPedo;
-    public Setting<Integer> blocksPerPlace;
-    public Setting<Integer> retryes;
-    public Setting<Boolean> ignore;
-    public Setting<Integer> kmhDisable;
-    public Setting<Boolean> center;
-    private final Timer retryTimer;
-    private final Map<BlockPos, Integer> retries;
+@ModuleManifest(label="AutoFeetPlace", category=Module.Category.COMBAT)
+
+public class AutoFeetPlace extends Module {
+
+    Minecraft mc = Minecraft.getMinecraft();
+    public Setting<Integer> delay = this.register(new Setting<Integer>("Delay", 5, 0, 100));
+
+    public Setting<Float> offset = this.register(new Setting<Float>("Y-Change Offset", 2f, 0f, 4f));
+    public Setting<Boolean> floor = this.register(new Setting<Boolean>("Floor", true));
+    public Setting<Boolean> smartHelper = this.register(new Setting<Boolean>("Smart Helper", true));
+    public Setting<Boolean> antiPedo = this.register(new Setting<Boolean>("Anti Pedo", true));
+    public Setting<Integer> blocksPerPlace = this.register(new Setting<Integer>("Blocks Per Place", 10, 2, 20));
+    public Setting<Integer> retryes = this.register(new Setting<Integer>("Retries", 15, 1, 25));
+    public Setting<Boolean> ignore = this.register(new Setting<Boolean>("Ignore Retries", true));
+    public Setting<Integer> kmhDisable = this.register(new Setting<Integer>("Speed Disable", 15, 1, 25));
+    public Setting<Boolean> center = this.register(new Setting<Boolean>("TPCenter", false));
+    private final Timer retryTimer = new Timer();
+    private final Map<BlockPos, Integer> retries = new HashMap<>();
     private BlockPos startPos;
-    boolean isPlacing;
-    boolean didPlace;
-    int placements;
-    int extenders;
-    int obbySlot;
+    boolean isPlacing = false;
+    boolean didPlace = false;
+    int placements = 0;
+    int extenders = 1;
+    int obbySlot = -1;
     int lastHotbarSlot;
-    int enableY;
-    
-    public AutoFeetPlace() {
-        this.mc = Minecraft.getMinecraft();
-        this.delay = (Setting<Integer>)this.register(new Setting("Delay", (Object)5, (Object)0, (Object)100));
-        this.offset = (Setting<Float>)this.register(new Setting("Y-Change Offset", (Object)2.0f, (Object)0.0f, (Object)4.0f));
-        this.floor = (Setting<Boolean>)this.register(new Setting("Floor", (Object)true));
-        this.smartHelper = (Setting<Boolean>)this.register(new Setting("Smart Helper", (Object)true));
-        this.antiPedo = (Setting<Boolean>)this.register(new Setting("Anti Pedo", (Object)true));
-        this.blocksPerPlace = (Setting<Integer>)this.register(new Setting("Blocks Per Place", (Object)10, (Object)2, (Object)20));
-        this.retryes = (Setting<Integer>)this.register(new Setting("Retries", (Object)15, (Object)1, (Object)25));
-        this.ignore = (Setting<Boolean>)this.register(new Setting("Ignore Retries", (Object)true));
-        this.kmhDisable = (Setting<Integer>)this.register(new Setting("Speed Disable", (Object)15, (Object)1, (Object)25));
-        this.center = (Setting<Boolean>)this.register(new Setting("TPCenter", (Object)false));
-        this.retryTimer = new Timer();
-        this.retries = new HashMap<BlockPos, Integer>();
-        this.isPlacing = false;
-        this.didPlace = false;
-        this.placements = 0;
-        this.extenders = 1;
-        this.obbySlot = -1;
-        this.enableY = -1;
-    }
-    
+    int enableY = -1;
+
+    @Override
     public void onEnable() {
         if (fullNullCheck()) {
-            this.toggle();
+            toggle();
             return;
         }
-        this.startPos = EntityUtil.getRoundedBlockPos((Entity)this.mc.player);
+        this.startPos = EntityUtil.getRoundedBlockPos(mc.player);
         if (this.center.getValue()) {
-            JordoHack.positionManager.setPositionPacket(this.startPos.getX() + 0.5, (double)this.startPos.getY(), this.startPos.getZ() + 0.5, true, true, true);
+            JordoHack.positionManager.setPositionPacket((double) this.startPos.getX() + 0.5, this.startPos.getY(), (double) this.startPos.getZ() + 0.5, true, true, true);
         }
-        this.enableY = (int)this.mc.player.posY;
-        this.lastHotbarSlot = this.mc.player.inventory.currentItem;
+        enableY = (int)mc.player.posY;
+        lastHotbarSlot = mc.player.inventory.currentItem;
     }
-    
+
+    @Override
     public void onDisable() {
-        this.isPlacing = false;
-        Objects.requireNonNull(this.mc.getConnection()).sendPacket((Packet)new CPacketHeldItemChange(this.lastHotbarSlot));
+        isPlacing = false;
+        Objects.requireNonNull(mc.getConnection()).sendPacket(new CPacketHeldItemChange(lastHotbarSlot));
     }
-    
+
     @EventHandler
-    public void onUpdate(final UpdateEvent event) {
-        this.doFeetPlace();
+    public void onUpdate(UpdateEvent event) {
+        doFeetPlace();
     }
-    
+
     private void doFeetPlace() {
-        if (this.check()) {
+        if (check()) {
             return;
         }
-        if (this.mc.player.posY > this.enableY + (float)this.offset.getValue()) {
+        if (mc.player.posY > enableY + offset.getValue()) {
             MessageUtil.sendClientMessage("<AutoFeetPlace> Above Surround Position, Toggling!", -22221);
-            this.toggle();
+            toggle();
             return;
         }
-        if (JordoHack.INSTANCE.getSpeedManager().getPlayerSpeed((EntityPlayer)this.mc.player) > (int)this.kmhDisable.getValue()) {
-            this.toggle();
+
+        if (JordoHack.INSTANCE.getSpeedManager().getPlayerSpeed(mc.player) > kmhDisable.getValue()) {
+            toggle();
             return;
         }
-        if (!BlockUtil.isSafe((Entity)this.mc.player, 0, (boolean)this.floor.getValue())) {
-            this.placeBlocks(this.mc.player.getPositionVector(), BlockUtil.getUnsafeBlockArray((Entity)this.mc.player, 0, (boolean)this.floor.getValue()), true, false, false);
-        }
-        else if (!BlockUtil.isSafe((Entity)this.mc.player, -1, false) && (boolean)this.antiPedo.getValue()) {
-            this.placeBlocks(this.mc.player.getPositionVector(), BlockUtil.getUnsafeBlockArray((Entity)this.mc.player, -1, false), false, false, true);
+
+        if (!BlockUtil.isSafe(mc.player, 0, floor.getValue())) {
+            placeBlocks(mc.player.getPositionVector(), BlockUtil.getUnsafeBlockArray(mc.player, 0, floor.getValue()), true, false, false);
+        } else if (!BlockUtil.isSafe(mc.player, -1, false)) {
+            if (antiPedo.getValue()) {
+                placeBlocks(mc.player.getPositionVector(), BlockUtil.getUnsafeBlockArray(mc.player, -1, false), false, false, true);
+            }
         }
     }
-    
-    private boolean placeBlocks(final Vec3d pos, final Vec3d[] vec3ds, final boolean hasHelpingBlocks, final boolean isHelping, final boolean isExtending) {
+
+
+    private boolean placeBlocks(Vec3d pos, Vec3d[] vec3ds, boolean hasHelpingBlocks, boolean isHelping, boolean isExtending) {
         int helpings = 0;
-        this.mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(this.obbySlot));
+        boolean gotHelp;
+        mc.getConnection().sendPacket(new CPacketHeldItemChange(obbySlot));
         for (final Vec3d vec3d : vec3ds) {
-            boolean gotHelp = true;
-            ++helpings;
-            if (isHelping && !(boolean)this.smartHelper.getValue() && helpings > 1) {
+            gotHelp = true;
+            helpings++;
+            if (isHelping && !smartHelper.getValue() && helpings > 1) {
                 return false;
             }
             final BlockPos position = new BlockPos(pos).add(vec3d.x, vec3d.y, vec3d.z);
-            Label_0289: {
-                switch (BlockUtil.isPositionPlaceable(position, true)) {
-                    case 1: {
-                        if (this.retries.get(position) == null || this.retries.get(position) < (int)this.retryes.getValue()) {
-                            this.placeBlock(position);
-                            this.retries.put(position, (this.retries.get(position) == null) ? 1 : (this.retries.get(position) + 1));
-                            this.retryTimer.reset();
-                            break;
-                        }
-                        break;
+            switch (BlockUtil.isPositionPlaceable(position, true)) {
+                case -1:
+                    continue;
+                case 1:
+                    if ((retries.get(position) == null || retries.get(position) < retryes.getValue())) {
+                        placeBlock(position);
+                        retries.put(position, (retries.get(position) == null ? 1 : (retries.get(position) + 1)));
+                        retryTimer.reset();
+                        continue;
                     }
-                    case 2: {
-                        if (hasHelpingBlocks) {
-                            gotHelp = this.placeBlocks(pos, BlockUtil.getHelpingBlocks(vec3d), false, true, true);
-                            break Label_0289;
-                        }
-                        break;
+
+                    continue;
+                case 2:
+                    if (hasHelpingBlocks) {
+                        gotHelp = placeBlocks(pos, BlockUtil.getHelpingBlocks(vec3d), false, true, true);
+                    } else {
+                        continue;
                     }
-                    case 3: {
-                        if (gotHelp) {
-                            this.placeBlock(position);
-                        }
-                        if (isHelping) {
-                            return true;
-                        }
-                        break;
+                case 3:
+                    if (gotHelp) {
+                        placeBlock(position);
                     }
-                }
+                    if (isHelping) {
+                        return true;
+                    }
             }
         }
-        this.mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(this.lastHotbarSlot));
+        mc.getConnection().sendPacket(new CPacketHeldItemChange(lastHotbarSlot));
         return false;
     }
-    
-    private void placeBlock(final BlockPos pos) {
-        if (this.placements < (int)this.blocksPerPlace.getValue()) {
-            this.isPlacing = true;
+
+    private void placeBlock(BlockPos pos) {
+        if (placements < blocksPerPlace.getValue()) {
+            isPlacing = true;
             BlockUtil.placeBlock(pos, false);
-            this.didPlace = true;
-            ++this.placements;
+            didPlace = true;
+            placements++;
         }
     }
-    
+
     private boolean check() {
         if (fullNullCheck()) {
             return true;
         }
-        this.isPlacing = false;
-        this.didPlace = false;
-        this.extenders = 1;
-        this.placements = 0;
-        this.obbySlot = ItemUtil.getItemSlotInHotbar(Item.getItemFromBlock(Blocks.OBSIDIAN));
-        if (this.retryTimer.hasReached(2500L)) {
-            this.retries.clear();
-            this.retryTimer.reset();
+        isPlacing = false;
+        didPlace = false;
+        extenders = 1;
+        placements = 0;
+        obbySlot = ItemUtil.getItemSlotInHotbar(Item.getItemFromBlock(Blocks.OBSIDIAN));
+
+        if (retryTimer.hasReached(2500)) {
+            retries.clear();
+            retryTimer.reset();
         }
-        if (this.obbySlot == -1) {
+
+        if (obbySlot == -1) {
             MessageUtil.sendClientMessage("<AutoFeetPlace> No Obsidian, Toggling!", -22221);
-            this.toggle();
+            toggle();
             return true;
         }
-        if (this.mc.player.inventory.currentItem != this.lastHotbarSlot && this.mc.player.inventory.currentItem != this.obbySlot) {
-            this.lastHotbarSlot = this.mc.player.inventory.currentItem;
+
+        if (mc.player.inventory.currentItem != lastHotbarSlot && mc.player.inventory.currentItem != obbySlot) {
+            lastHotbarSlot = mc.player.inventory.currentItem;
         }
+
         return false;
     }
+
 }

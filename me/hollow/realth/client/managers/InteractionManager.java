@@ -1,173 +1,198 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.managers;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.util.BlockUtil;
+import me.hollow.realth.api.util.Timer;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityEnderCrystal;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.network.play.client.CPacketEntityAction;
+import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import net.minecraft.client.*;
-import net.minecraft.block.*;
-import net.minecraft.util.math.*;
-import me.hollow.realth.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
-import net.minecraft.init.*;
-import net.minecraft.network.play.client.*;
-import net.minecraft.network.*;
-import net.minecraft.util.*;
+//author lyric
 
-public class InteractionManager
-{
-    private final Minecraft mc;
-    public final List<Block> sneakBlocks;
-    public final List<Block> shulkers;
-    
-    public InteractionManager() {
-        this.mc = Minecraft.getMinecraft();
-        this.sneakBlocks = Arrays.asList(Blocks.ENDER_CHEST, Blocks.ANVIL, (Block)Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.CRAFTING_TABLE, Blocks.BREWING_STAND, (Block)Blocks.HOPPER, Blocks.DROPPER, Blocks.DISPENSER, Blocks.TRAPDOOR, Blocks.ENCHANTING_TABLE);
-        this.shulkers = Arrays.asList(Blocks.WHITE_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.MAGENTA_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.YELLOW_SHULKER_BOX, Blocks.LIME_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.SILVER_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.BLACK_SHULKER_BOX);
-    }
-    
+public class InteractionManager {
+    private final Minecraft mc = Minecraft.getMinecraft();
+
+    public final List<Block> sneakBlocks = Arrays.asList(
+            Blocks.ENDER_CHEST,
+            Blocks.ANVIL,
+            Blocks.CHEST,
+            Blocks.TRAPPED_CHEST,
+            Blocks.CRAFTING_TABLE,
+            Blocks.BREWING_STAND,
+            Blocks.HOPPER,
+            Blocks.DROPPER,
+            Blocks.DISPENSER,
+            Blocks.TRAPDOOR,
+            Blocks.ENCHANTING_TABLE
+    );
+
+    public final List<Block> shulkers = Arrays.asList(
+            Blocks.WHITE_SHULKER_BOX,
+            Blocks.ORANGE_SHULKER_BOX,
+            Blocks.MAGENTA_SHULKER_BOX,
+            Blocks.LIGHT_BLUE_SHULKER_BOX,
+            Blocks.YELLOW_SHULKER_BOX,
+            Blocks.LIME_SHULKER_BOX,
+            Blocks.PINK_SHULKER_BOX,
+            Blocks.GRAY_SHULKER_BOX,
+            Blocks.SILVER_SHULKER_BOX,
+            Blocks.CYAN_SHULKER_BOX,
+            Blocks.PURPLE_SHULKER_BOX,
+            Blocks.BLUE_SHULKER_BOX,
+            Blocks.BROWN_SHULKER_BOX,
+            Blocks.GREEN_SHULKER_BOX,
+            Blocks.RED_SHULKER_BOX,
+            Blocks.BLACK_SHULKER_BOX
+    );
+
+
     public EnumFacing getFirstEnumFacing(final BlockPos pos) {
-        return this.getEnumFacingSides(pos).stream().findFirst().orElse(null);
+        return getEnumFacingSides(pos).stream().findFirst().orElse(null);
     }
-    
+
     public ArrayList<EnumFacing> getEnumFacingSides(final BlockPos pos) {
-        final ArrayList<EnumFacing> sides = new ArrayList<EnumFacing>();
-        final BlockPos pos2;
-        final ArrayList<EnumFacing> list;
+        final ArrayList<EnumFacing> sides = new ArrayList<>();
         Arrays.stream(EnumFacing.values()).forEach(side -> {
-            pos2 = pos.offset(side);
-            if (this.mc.world.getBlockState(pos2).getBlock().canCollideCheck(this.mc.world.getBlockState(pos2), false) && !this.mc.world.getBlockState(pos2).getMaterial().isReplaceable()) {
-                list.add(side);
+            final BlockPos pos1 = pos.offset(side);
+            if (mc.world.getBlockState(pos1).getBlock().canCollideCheck(mc.world.getBlockState(pos1), false)) {
+                if (!mc.world.getBlockState(pos1).getMaterial().isReplaceable()) {
+                    sides.add(side);
+                }
             }
-            return;
         });
         return sides;
     }
-    
+
     public ArrayList<EnumFacing> getVisibleSides(final BlockPos pos) {
-        final ArrayList<EnumFacing> sides = new ArrayList<EnumFacing>();
-        final Vec3d vec = new Vec3d((Vec3i)pos).add(0.5, 0.5, 0.5);
-        final Vec3d eye = this.mc.player.getPositionEyes(1.0f);
+        final ArrayList<EnumFacing> sides = new ArrayList<>();
+        final Vec3d vec = new Vec3d(pos).add(0.5, 0.5, 0.5);
+        final Vec3d eye = mc.player.getPositionEyes(1);
         final double facingX = eye.x - vec.x;
         final double facingY = eye.y - vec.y;
         final double facingZ = eye.z - vec.z;
         if (facingX < -0.5) {
             sides.add(EnumFacing.WEST);
-        }
-        else if (facingX > 0.5) {
+        } else if (facingX > 0.5) {
             sides.add(EnumFacing.EAST);
-        }
-        else if (this.isVisible(pos)) {
+        } else if (isVisible(pos)) {
             sides.add(EnumFacing.WEST);
             sides.add(EnumFacing.EAST);
         }
         if (facingY < -0.5) {
             sides.add(EnumFacing.DOWN);
-        }
-        else if (facingY > 0.5) {
+        } else if (facingY > 0.5) {
             sides.add(EnumFacing.UP);
-        }
-        else {
+        } else {
             sides.add(EnumFacing.DOWN);
             sides.add(EnumFacing.UP);
         }
         if (facingZ < -0.5) {
             sides.add(EnumFacing.NORTH);
-        }
-        else if (facingZ > 0.5) {
+        } else if (facingZ > 0.5) {
             sides.add(EnumFacing.SOUTH);
-        }
-        else if (this.isVisible(pos)) {
+        } else if (isVisible(pos)) {
             sides.add(EnumFacing.NORTH);
             sides.add(EnumFacing.SOUTH);
         }
         return sides;
     }
-    
     public void interactBlock(final BlockPos pos, final EnumFacing enumFacing) {
-        this.mc.playerController.onPlayerDamageBlock(pos, enumFacing);
+        mc.playerController.onPlayerDamageBlock(pos, enumFacing);
     }
-    
     protected boolean isVisible(final BlockPos pos) {
-        return !this.mc.world.getBlockState(pos).isFullBlock() || !this.mc.world.isAirBlock(pos);
+        return !mc.world.getBlockState(pos).isFullBlock() || !mc.world.isAirBlock(pos);
     }
-    
+
     public void load() {
-        JordoHack.INSTANCE.getEventManager().registerListener((Object)this);
+        JordoHack.INSTANCE.getEventManager().registerListener(this);
     }
-    
+
     public void unload() {
-        JordoHack.INSTANCE.getEventManager().deregisterListener((Object)this);
+        JordoHack.INSTANCE.getEventManager().deregisterListener(this);
     }
-    
+
+
     public EnumFacing closestEnumFacing(final BlockPos pos) {
-        final TreeMap<Double, EnumFacing> enumFacingTreeMap = JordoHack.interactionManager.getVisibleSides(pos).stream().collect((Collector<? super Object, ?, TreeMap<Double, EnumFacing>>)Collectors.toMap(enumFacing -> this.getDistanceToFace(pos, enumFacing), enumFacing -> enumFacing, (a, b) -> b, (Supplier<R>)TreeMap::new));
+        final TreeMap<Double, EnumFacing> enumFacingTreeMap = JordoHack.interactionManager.getVisibleSides(pos).stream().collect(Collectors.toMap(enumFacing -> getDistanceToFace(pos, enumFacing), enumFacing -> enumFacing, (a, b) -> b, TreeMap::new));
         return enumFacingTreeMap.firstEntry().getValue();
     }
-    
+
     protected double getDistanceToFace(final BlockPos pos, final EnumFacing enumFacing) {
         Vec3i vec3i = new Vec3i(0.5, 0.5, 0.5);
         switch (enumFacing) {
-            case NORTH: {
+            case NORTH:
                 vec3i = new Vec3i(0.5, 0.5, -1.5);
                 break;
-            }
-            case EAST: {
+            case EAST:
                 vec3i = new Vec3i(1.5, 0.5, 0.5);
                 break;
-            }
-            case SOUTH: {
+            case SOUTH:
                 vec3i = new Vec3i(0.5, 0.5, 1.5);
                 break;
-            }
-            case WEST: {
+            case WEST:
                 vec3i = new Vec3i(-1.5, 0.5, 0.5);
                 break;
-            }
-            case UP: {
+            case UP:
                 vec3i = new Vec3i(0.5, 1.5, 0.5);
                 break;
-            }
-            case DOWN: {
+            case DOWN:
                 vec3i = new Vec3i(0.5, -1.5, 0.5);
                 break;
-            }
         }
-        return this.mc.player.getDistanceSq(pos.add(vec3i));
+        return mc.player.getDistanceSq(pos.add(vec3i));
     }
-    
+
     public void attemptBreak(final BlockPos pos, final EnumFacing enumFacing) {
         final int slot = JordoHack.inventoryManager.getItemFromHotbar(Items.DIAMOND_PICKAXE);
-        if (slot != -1 && this.mc.player != null && this.mc.player.connection != null) {
-            final int currentItem = this.mc.player.inventory.currentItem;
-            JordoHack.inventoryManager.switchToSlot(slot);
-            try {
-                this.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, enumFacing));
+        if (slot != -1) {
+            if (mc.player != null && mc.player.connection != null) {
+                final int currentItem = mc.player.inventory.currentItem;
+                JordoHack.inventoryManager.switchToSlot(slot);
+                try {
+                    mc.player.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, enumFacing));
+                } catch (Exception ignored) {
+                }
+                JordoHack.inventoryManager.switchBack(currentItem);
             }
-            catch (Exception ex) {}
-            JordoHack.inventoryManager.switchBack(currentItem);
         }
     }
-    
+
     public void initiateBreaking(final BlockPos pos, final EnumFacing enumFacing, final boolean swing) {
-        if (this.mc.player.connection != null) {
-            this.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, pos, enumFacing));
-            this.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, enumFacing));
+        if (mc.player.connection != null) {
+            mc.player.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, pos, enumFacing));
+            mc.player.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, enumFacing));
         }
         if (swing) {
-            this.mc.player.swingArm(EnumHand.MAIN_HAND);
+            mc.player.swingArm(EnumHand.MAIN_HAND);
         }
     }
-    
+
     public void abort(final BlockPos pos, final EnumFacing enumFacing) {
-        if (this.mc.player.connection != null) {
-            this.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, pos, enumFacing));
+        if (mc.player.connection != null) {
+            mc.player.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, pos, enumFacing));
         }
-        this.mc.playerController.isHittingBlock = false;
-        this.mc.playerController.curBlockDamageMP = 0.0f;
-        this.mc.world.sendBlockBreakProgress(this.mc.player.getEntityId(), pos, -1);
-        this.mc.player.resetCooldown();
+        mc.playerController.isHittingBlock = false;
+        mc.playerController.curBlockDamageMP = 0.0f;
+        mc.world.sendBlockBreakProgress(mc.player.getEntityId(), pos, -1);
+        mc.player.resetCooldown();
     }
 }

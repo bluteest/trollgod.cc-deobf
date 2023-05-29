@@ -1,25 +1,21 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.player;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.client.events.*;
-import net.minecraft.client.entity.*;
-import net.b0at.api.event.*;
+import me.hollow.realth.client.events.UpdateEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.b0at.api.event.EventHandler;
 
-@ModuleManifest(label = "FastDrop", category = Module.Category.PLAYER)
-public class FastDrop extends Module
-{
+@ModuleManifest(label="FastDrop", category=Module.Category.PLAYER)
+public class FastDrop
+        extends Module {
+
     @EventHandler
-    public void onUpdate(final UpdateEvent event) {
-        if (FastDrop.mc.player == null || FastDrop.mc.world == null || FastDrop.mc.player.isInWater() || FastDrop.mc.player.isInLava() || FastDrop.mc.player.isOnLadder()) {
+    public void onUpdate(UpdateEvent event) {
+        if (this.mc.player == null || this.mc.world == null || this.mc.player.isInWater() || this.mc.player.isInLava() || this.mc.player.isOnLadder()) {
             return;
         }
-        if (FastDrop.mc.player.onGround) {
-            final EntityPlayerSP player = FastDrop.mc.player;
-            player.motionY -= 2.0;
+        if (this.mc.player.onGround) {
+            this.mc.player.motionY -= (double)((float)20 / 10.0f);
         }
     }
 }

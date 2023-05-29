@@ -1,48 +1,40 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.movement;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.fml.common.eventhandler.*;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import me.hollow.realth.api.property.Setting;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@ModuleManifest(label = "Sprint", category = Module.Category.MOVEMENT)
-public class Sprint extends Module
-{
-    private final Setting<Mode> mode;
-    
-    public Sprint() {
-        this.mode = (Setting<Mode>)this.register(new Setting("Mode", (Object)Mode.RAGE));
-    }
-    
+@ModuleManifest(label="Sprint", category= Module.Category.MOVEMENT)
+public class Sprint
+        extends Module {
+    private final Setting<Mode> mode = this.register(new Setting<Mode>("Mode", Mode.RAGE));
+
+
     @SubscribeEvent
-    public void onUpdate(final LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving() == Sprint.mc.player) {
-            switch ((Mode)this.mode.getValue()) {
-                case RAGE: {
-                    if ((Sprint.mc.gameSettings.keyBindForward.isKeyDown() || Sprint.mc.gameSettings.keyBindBack.isKeyDown() || Sprint.mc.gameSettings.keyBindLeft.isKeyDown() || Sprint.mc.gameSettings.keyBindRight.isKeyDown()) && !Sprint.mc.player.isSneaking() && !Sprint.mc.player.collidedHorizontally && Sprint.mc.player.getFoodStats().getFoodLevel() > 6.0f) {
-                        Sprint.mc.player.setSprinting(true);
-                        break;
+    public void onUpdate(LivingEvent.LivingUpdateEvent event) {
+        if (event.getEntityLiving() == mc.player) {
+            switch (mode.getValue()) {
+                case RAGE:
+                    if ((mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown()) && !(mc.player.isSneaking() || mc.player.collidedHorizontally || mc.player.getFoodStats().getFoodLevel() <= 6f)) {
+                        mc.player.setSprinting(true);
                     }
                     break;
-                }
-                case LEGIT: {
-                    if (Sprint.mc.gameSettings.keyBindForward.isKeyDown() && !Sprint.mc.player.isSneaking() && !Sprint.mc.player.isHandActive() && !Sprint.mc.player.collidedHorizontally && Sprint.mc.player.getFoodStats().getFoodLevel() > 6.0f && Sprint.mc.currentScreen == null) {
-                        Sprint.mc.player.setSprinting(true);
-                        break;
+                case LEGIT:
+                    if (mc.gameSettings.keyBindForward.isKeyDown() && !(mc.player.isSneaking() || mc.player.isHandActive() || mc.player.collidedHorizontally || mc.player.getFoodStats().getFoodLevel() <= 6f) && mc.currentScreen == null) {
+                        mc.player.setSprinting(true);
                     }
                     break;
-                }
             }
         }
     }
-    
-    public enum Mode
-    {
-        LEGIT, 
-        RAGE;
+
+    public static enum Mode {
+        LEGIT,
+
+        RAGE
+
     }
+
 }

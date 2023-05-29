@@ -1,16 +1,18 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.command.commands;
 
-import me.hollow.realth.client.command.*;
-import me.hollow.realth.*;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.client.command.Command;
+import me.hollow.realth.client.command.CommandManifest;
 
-@CommandManifest(label = "Save", aliases = { "s" })
-public class SaveCommand extends Command
-{
-    public void execute(final String[] args) {
+@CommandManifest(label="Save", aliases={"s"})
+public class SaveCommand
+extends Command {
+    @Override
+    public void execute(String[] args) {
         JordoHack.INSTANCE.getConfigManager().saveConfig(JordoHack.INSTANCE.getConfigManager().config.replaceFirst("TrollGod/", ""));
     }
 }
+

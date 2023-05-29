@@ -1,108 +1,111 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.managers;
 
-import java.util.function.*;
-import java.nio.file.attribute.*;
-import me.hollow.realth.client.modules.*;
-import java.io.*;
-import java.util.stream.*;
-import java.nio.charset.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import me.hollow.realth.client.modules.Module;
 
-public class FileManager
-{
-    private final Path base;
-    private final Path config;
-    
-    private String[] expandPath(final String fullPath) {
+public class FileManager {
+    private final Path base = this.getMkDirectory(this.getRoot(), "TrollGod");
+    private final Path config = this.getMkDirectory(this.base, "config");
+
+    private String[] expandPath(String fullPath) {
         return fullPath.split(":?\\\\\\\\|\\/");
     }
-    
-    private Stream<String> expandPaths(final String... paths) {
-        return Arrays.stream(paths).map((Function<? super String, ?>)this::expandPath).flatMap((Function<? super Object, ? extends Stream<? extends String>>)Arrays::stream);
+
+    private Stream<String> expandPaths(String ... paths) {
+        return Arrays.stream(paths).map(this::expandPath).flatMap(Arrays::stream);
     }
-    
-    private Path lookupPath(final Path root, final String... paths) {
+
+    private Path lookupPath(Path root, String ... paths) {
         return Paths.get(root.toString(), paths);
     }
-    
+
     private Path getRoot() {
         return Paths.get("", new String[0]);
     }
-    
-    private void createDirectory(final Path dir) {
+
+    private void createDirectory(Path dir) {
         try {
             if (!Files.isDirectory(dir, new LinkOption[0])) {
                 if (Files.exists(dir, new LinkOption[0])) {
                     Files.delete(dir);
                 }
-                Files.createDirectories(dir, (FileAttribute<?>[])new FileAttribute[0]);
+                Files.createDirectories(dir, new FileAttribute[0]);
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    private Path getMkDirectory(final Path parent, final String... paths) {
+
+    private Path getMkDirectory(Path parent, String ... paths) {
         if (paths.length < 1) {
             return parent;
         }
-        final Path dir = this.lookupPath(parent, paths);
+        Path dir = this.lookupPath(parent, paths);
         this.createDirectory(dir);
         return dir;
     }
-    
+
     public FileManager() {
-        this.base = this.getMkDirectory(this.getRoot(), "TrollGod");
-        this.config = this.getMkDirectory(this.base, "config");
         this.getMkDirectory(this.base, "util");
-        for (final Module.Category category : Module.Category.values()) {
+        for (Module.Category category : Module.Category.values()) {
             this.getMkDirectory(this.config, category.getLabel());
         }
     }
-    
+
     public Path getBasePath() {
         return this.base;
     }
-    
-    public Path getBaseResolve(final String... paths) {
-        final String[] names = this.expandPaths(paths).toArray(String[]::new);
+
+    public Path getBaseResolve(String ... paths) {
+        String[] names = (String[])this.expandPaths(paths).toArray(String[]::new);
         if (names.length < 1) {
             throw new IllegalArgumentException("missing path");
         }
         return this.lookupPath(this.getBasePath(), names);
     }
-    
-    public Path getMkBaseResolve(final String... paths) {
-        final Path path = this.getBaseResolve(paths);
+
+    public Path getMkBaseResolve(String ... paths) {
+        Path path = this.getBaseResolve(paths);
         this.createDirectory(path.getParent());
         return path;
     }
-    
+
     public Path getConfig() {
         return this.getBasePath().resolve("config");
     }
-    
+
     public Path getCache() {
         return this.getBasePath().resolve("cache");
     }
-    
-    public Path getMkBaseDirectory(final String... names) {
+
+    public Path getMkBaseDirectory(String ... names) {
         return this.getMkDirectory(this.getBasePath(), this.expandPaths(names).collect(Collectors.joining(File.separator)));
     }
-    
-    public Path getMkConfigDirectory(final String... names) {
+
+    public Path getMkConfigDirectory(String ... names) {
         return this.getMkDirectory(this.getConfig(), this.expandPaths(names).collect(Collectors.joining(File.separator)));
     }
-    
-    public static boolean appendTextFile(final String data, final String file) {
+
+    public static boolean appendTextFile(String data, String file) {
         try {
-            final Path path = Paths.get(file, new String[0]);
+            Path path = Paths.get(file, new String[0]);
             Files.write(path, Collections.singletonList(data), StandardCharsets.UTF_8, Files.exists(path, new LinkOption[0]) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
         }
         catch (IOException e) {
@@ -111,16 +114,17 @@ public class FileManager
         }
         return true;
     }
-    
-    public static List<String> readTextFileAllLines(final String file) {
+
+    public static List<String> readTextFileAllLines(String file) {
         try {
-            final Path path = Paths.get(file, new String[0]);
+            Path path = Paths.get(file, new String[0]);
             return Files.readAllLines(path, StandardCharsets.UTF_8);
         }
         catch (IOException e) {
             System.out.println("WARNING: Unable to read file, creating new file: " + file);
-            appendTextFile("", file);
+            FileManager.appendTextFile("", file);
             return Collections.emptyList();
         }
     }
 }
+

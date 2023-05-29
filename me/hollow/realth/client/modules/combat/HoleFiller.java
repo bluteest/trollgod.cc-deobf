@@ -1,205 +1,221 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.combat;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import net.minecraft.entity.player.*;
-import java.util.concurrent.*;
-import me.hollow.realth.*;
-import net.minecraft.init.*;
-import net.minecraft.item.*;
-import net.minecraft.entity.*;
-import net.minecraft.util.math.*;
+import me.hollow.realth.JordoHack;
 import me.hollow.realth.api.util.*;
-import net.minecraft.util.*;
-import java.util.function.*;
-import java.util.stream.*;
-import java.util.*;
+import me.hollow.realth.api.util.BlockPlaceUtil;
+import me.hollow.realth.client.events.PacketEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import me.hollow.realth.api.property.Setting;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.network.play.server.SPacketBlockChange;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import static net.minecraft.util.EnumHand.MAIN_HAND;
 
-@ModuleManifest(label = "HoleFiller", category = Category.COMBAT)
-public class HoleFiller extends Module
-{
-    private final Setting<Boolean> rotate;
-    private final Setting<Boolean> packet;
-    private final Setting<Boolean> webs;
-    private final Setting<Boolean> autoDisable;
-    private final Setting<Double> range;
-    private final Setting<Boolean> smart;
-    private final Setting<Logic> logic;
-    private final Setting<Integer> smartRange;
-    private final Map<BlockPos, Long> renderBlocks;
+@ModuleManifest(label="HoleFiller", category=Module.Category.COMBAT)
+
+public class HoleFiller extends Module {
+
+    private final Setting<Boolean> rotate = this.register(new Setting<>("Rotate", false));
+    private final Setting<Boolean> packet = this.register(new Setting<>("Packet", false, v -> rotate.getValue()));
+    private final Setting<Boolean> webs = this.register(new Setting<>("Webs", false));
+    private final Setting<Boolean> autoDisable = this.register(new Setting<>("AutoDisable", true));
+    private final Setting<Double> range = this.register(new Setting<>("Radius", 4.0, 0.0, 6));
+    private final Setting<Boolean> smart = this.register(new Setting<>("Smart", false));
+    private final Setting<Logic> logic = this.register(new Setting<>("Logic", Logic.PLAYER, v -> smart.getValue()));
+    private final Setting<Integer> smartRange = this.register(new Setting<>("EnemyRange", 4, 0, 6, v -> smart.getValue()));
+    private final Map<BlockPos, Long> renderBlocks = new ConcurrentHashMap<>();
+
+
     private EntityPlayer closestTarget;
-    
-    public HoleFiller() {
-        this.rotate = (Setting<Boolean>)this.register(new Setting("Rotate", (Object)false));
-        this.packet = (Setting<Boolean>)this.register(new Setting("Packet", (Object)false, v -> (boolean)this.rotate.getValue()));
-        this.webs = (Setting<Boolean>)this.register(new Setting("Webs", (Object)false));
-        this.autoDisable = (Setting<Boolean>)this.register(new Setting("AutoDisable", (Object)true));
-        this.range = (Setting<Double>)this.register(new Setting("Radius", (Object)4.0, (Object)0.0, (Object)6));
-        this.smart = (Setting<Boolean>)this.register(new Setting("Smart", (Object)false));
-        this.logic = (Setting<Logic>)this.register(new Setting("Logic", (Object)Logic.PLAYER, v -> (boolean)this.smart.getValue()));
-        this.smartRange = (Setting<Integer>)this.register(new Setting("EnemyRange", (Object)4, (Object)0, (Object)6, v -> (boolean)this.smart.getValue()));
-        this.renderBlocks = new ConcurrentHashMap<BlockPos, Long>();
+    private enum Logic {
+        PLAYER,
+        HOLE
     }
-    
+
     @Override
     public void onDisable() {
-        this.closestTarget = null;
+        closestTarget = null;
         JordoHack.INSTANCE.getRotationManager().resetRotationsPacket();
     }
-    
+
     @Override
     public String getInfo() {
-        if (this.smart.getValue()) {
-            return JordoHack.INSTANCE.getFontManager().normalizeCases(this.logic.getValue());
+        if (smart.getValue()) {
+            return JordoHack.INSTANCE.getFontManager().normalizeCases(logic.getValue());
+
+        } else {
+            return "Normal";
         }
-        return "Normal";
     }
-    
+
     @Override
     public void onUpdate() {
-        if (HoleFiller.mc.world == null) {
+        if (mc.world == null) {
             return;
         }
-        if (this.smart.getValue()) {
-            this.findClosestTarget();
+        if (smart.getValue()) {
+            findClosestTarget();
         }
-        final List<BlockPos> blocks = this.getPlacePositions();
+        List<BlockPos> blocks = getPlacePositions();
         BlockPos q = null;
-        final int obbySlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock(Blocks.OBSIDIAN));
-        final int eChestSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock(Blocks.ENDER_CHEST));
-        final int webSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock(Blocks.WEB));
+
+        int obbySlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock((Block)Blocks.OBSIDIAN));
+        int eChestSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock((Block)Blocks.ENDER_CHEST));
+        int webSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock((Block)Blocks.WEB));
+
         if (obbySlot == -1 && eChestSlot == -1) {
             MessageUtil.sendClientMessage("<HoleFiller> No Obsidian or Ender Chests, Toggling!", -22221);
             this.toggle();
             return;
+
         }
-        final int originalSlot = HoleFiller.mc.player.inventory.currentItem;
-        for (final BlockPos blockPos : blocks) {
-            if (!HoleFiller.mc.world.getEntitiesWithinAABB((Class)Entity.class, new AxisAlignedBB(blockPos)).isEmpty()) {
+
+        int originalSlot = mc.player.inventory.currentItem;
+
+        for (BlockPos blockPos : blocks) {
+            if (!mc.world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(blockPos)).isEmpty()) continue;
+            if (smart.getValue() && isInRange(blockPos)) {
+                q = blockPos;
+                continue;
+            } else if (smart.getValue() && isInRange(blockPos) && logic.getValue() == Logic.HOLE && closestTarget.getDistanceSq(blockPos) <= smartRange.getValue()) {
+                q = blockPos;
                 continue;
             }
-            if ((boolean)this.smart.getValue() && this.isInRange(blockPos)) {
-                q = blockPos;
-            }
-            else if ((boolean)this.smart.getValue() && this.isInRange(blockPos) && this.logic.getValue() == Logic.HOLE && this.closestTarget.getDistanceSq(blockPos) <= (int)this.smartRange.getValue()) {
-                q = blockPos;
-            }
-            else {
-                q = blockPos;
-            }
+            q = blockPos;
         }
-        if (q != null && HoleFiller.mc.player.onGround) {
-            HoleFiller.mc.player.inventory.currentItem = (this.webs.getValue() ? ((webSlot == -1) ? ((obbySlot == -1) ? eChestSlot : obbySlot) : webSlot) : ((obbySlot == -1) ? eChestSlot : obbySlot));
-            HoleFiller.mc.playerController.updateController();
-            this.renderBlocks.put(q, System.currentTimeMillis());
-            BlockPlaceUtil.placeBlock(q, (boolean)this.rotate.getValue(), (boolean)this.packet.getValue());
-            if (HoleFiller.mc.player.inventory.currentItem != originalSlot) {
-                HoleFiller.mc.player.inventory.currentItem = originalSlot;
-                HoleFiller.mc.playerController.updateController();
+
+        if (q != null && mc.player.onGround) {
+
+            mc.player.inventory.currentItem = webs.getValue() ? (webSlot == -1 ? (obbySlot == -1 ? eChestSlot : obbySlot) : webSlot) : (obbySlot == -1 ? eChestSlot : obbySlot);
+
+            mc.playerController.updateController();
+            renderBlocks.put(q, System.currentTimeMillis());
+
+            BlockPlaceUtil.placeBlock(q, rotate.getValue(), packet.getValue());
+
+            if (mc.player.inventory.currentItem != originalSlot) {
+                mc.player.inventory.currentItem = originalSlot;
+                mc.playerController.updateController();
             }
-            HoleFiller.mc.player.swingArm(EnumHand.MAIN_HAND);
-            HoleFiller.mc.player.inventory.currentItem = originalSlot;
+            mc.player.swingArm(MAIN_HAND);
+            mc.player.inventory.currentItem = originalSlot;
         }
-        if (q == null && (boolean)this.autoDisable.getValue() && !(boolean)this.smart.getValue()) {
-            this.toggle();
+        if (q == null && autoDisable.getValue() && !smart.getValue()) {
+            toggle();
         }
     }
-    
-    private boolean isHole(final BlockPos pos) {
-        final BlockPos boost = pos.add(0, 1, 0);
-        final BlockPos boost2 = pos.add(0, 0, 0);
-        final BlockPos boost3 = pos.add(0, 0, -1);
-        final BlockPos boost4 = pos.add(1, 0, 0);
-        final BlockPos boost5 = pos.add(-1, 0, 0);
-        final BlockPos boost6 = pos.add(0, 0, 1);
-        final BlockPos boost7 = pos.add(0, 2, 0);
-        final BlockPos boost8 = pos.add(0.5, 0.5, 0.5);
-        final BlockPos boost9 = pos.add(0, -1, 0);
-        return HoleFiller.mc.world.getBlockState(boost).getBlock() == Blocks.AIR && HoleFiller.mc.world.getBlockState(boost2).getBlock() == Blocks.AIR && HoleFiller.mc.world.getBlockState(boost7).getBlock() == Blocks.AIR && (HoleFiller.mc.world.getBlockState(boost3).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost3).getBlock() == Blocks.BEDROCK) && (HoleFiller.mc.world.getBlockState(boost4).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost4).getBlock() == Blocks.BEDROCK) && (HoleFiller.mc.world.getBlockState(boost5).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost5).getBlock() == Blocks.BEDROCK) && (HoleFiller.mc.world.getBlockState(boost6).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost6).getBlock() == Blocks.BEDROCK) && HoleFiller.mc.world.getBlockState(boost8).getBlock() == Blocks.AIR && (HoleFiller.mc.world.getBlockState(boost9).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost9).getBlock() == Blocks.BEDROCK);
+
+    private boolean isHole(BlockPos pos) {
+        BlockPos boost = pos.add(0, 1, 0);
+        BlockPos boost2 = pos.add(0, 0, 0);
+        BlockPos boost3 = pos.add(0, 0, -1);
+        BlockPos boost4 = pos.add(1, 0, 0);
+        BlockPos boost5 = pos.add(-1, 0, 0);
+        BlockPos boost6 = pos.add(0, 0, 1);
+        BlockPos boost7 = pos.add(0, 2, 0);
+        BlockPos boost8 = pos.add(0.5, 0.5, 0.5);
+        BlockPos boost9 = pos.add(0, -1, 0);
+        return !(mc.world.getBlockState(boost).getBlock() != Blocks.AIR || mc.world.getBlockState(boost2).getBlock() != Blocks.AIR || mc.world.getBlockState(boost7).getBlock() != Blocks.AIR || mc.world.getBlockState(boost3).getBlock() != Blocks.OBSIDIAN && mc.world.getBlockState(boost3).getBlock() != Blocks.BEDROCK || mc.world.getBlockState(boost4).getBlock() != Blocks.OBSIDIAN && mc.world.getBlockState(boost4).getBlock() != Blocks.BEDROCK || mc.world.getBlockState(boost5).getBlock() != Blocks.OBSIDIAN && mc.world.getBlockState(boost5).getBlock() != Blocks.BEDROCK || mc.world.getBlockState(boost6).getBlock() != Blocks.OBSIDIAN && mc.world.getBlockState(boost6).getBlock() != Blocks.BEDROCK || mc.world.getBlockState(boost8).getBlock() != Blocks.AIR || mc.world.getBlockState(boost9).getBlock() != Blocks.OBSIDIAN && mc.world.getBlockState(boost9).getBlock() != Blocks.BEDROCK);
     }
-    
+
     private BlockPos getPlayerPos() {
-        return new BlockPos(Math.floor(HoleFiller.mc.player.posX), Math.floor(HoleFiller.mc.player.posY), Math.floor(HoleFiller.mc.player.posZ));
+        return new BlockPos(Math.floor(mc.player.posX), Math.floor(mc.player.posY), Math.floor(mc.player.posZ));
     }
-    
+
     private BlockPos getClosestTargetPos() {
-        if (this.closestTarget != null) {
-            return new BlockPos(Math.floor(this.closestTarget.posX), Math.floor(this.closestTarget.posY), Math.floor(this.closestTarget.posZ));
+        if (closestTarget != null) {
+            return new BlockPos(Math.floor(closestTarget.posX), Math.floor(closestTarget.posY), Math.floor(closestTarget.posZ));
         }
         return null;
     }
-    
+
     private void findClosestTarget() {
-        final List<EntityPlayer> playerList = (List<EntityPlayer>)HoleFiller.mc.world.playerEntities;
-        this.closestTarget = null;
-        for (final EntityPlayer target : playerList) {
-            if (target != HoleFiller.mc.player && !JordoHack.INSTANCE.getFriendManager().isFriend(target.getName()) && EntityUtil.isLiving((Entity)target)) {
-                if (target.getHealth() <= 0.0f) {
-                    continue;
-                }
-                if (this.closestTarget == null) {
-                    this.closestTarget = target;
-                }
-                else {
-                    if (HoleFiller.mc.player.getDistance((Entity)target) >= HoleFiller.mc.player.getDistance((Entity)this.closestTarget)) {
-                        continue;
-                    }
-                    this.closestTarget = target;
-                }
+        List<EntityPlayer> playerList = mc.world.playerEntities;
+
+        closestTarget = null;
+
+        for (EntityPlayer target : playerList) {
+            if (target == mc.player || JordoHack.INSTANCE.getFriendManager().isFriend(target.getName()) || !EntityUtil.isLiving(target) || target.getHealth() <= 0.0f) continue;
+            if (closestTarget == null) {
+                closestTarget = target;
+                continue;
             }
+
+            if (!(mc.player.getDistance(target) < mc.player.getDistance(closestTarget))) continue;
+            closestTarget = target;
         }
     }
-    
-    private boolean isInRange(final BlockPos blockPos) {
-        final NonNullList positions = NonNullList.create();
-        positions.addAll((Collection)this.getSphere(this.getPlayerPos(), ((Double)this.range.getValue()).floatValue(), ((Double)this.range.getValue()).intValue()).stream().filter((Predicate<? super Object>)this::isHole).collect((Collector<? super Object, ?, List<? super Object>>)Collectors.toList()));
-        return positions.contains((Object)blockPos);
+
+    private boolean isInRange(BlockPos blockPos) {
+        NonNullList positions = NonNullList.create();
+
+        positions.addAll(getSphere(getPlayerPos(), range.getValue().floatValue(), range.getValue().intValue()).stream().filter(this::isHole).collect(Collectors.toList()));
+        return positions.contains(blockPos);
     }
-    
+
     private List<BlockPos> getPlacePositions() {
-        final NonNullList positions = NonNullList.create();
-        if ((boolean)this.smart.getValue() && this.closestTarget != null) {
-            positions.addAll((Collection)this.getSphere(this.getClosestTargetPos(), (float)this.smartRange.getValue(), ((Double)this.range.getValue()).intValue()).stream().filter((Predicate<? super Object>)this::isHole).filter((Predicate<? super Object>)this::isInRange).collect((Collector<? super Object, ?, List<? super Object>>)Collectors.toList()));
+        NonNullList positions = NonNullList.create();
+
+        if (smart.getValue() && closestTarget != null) {
+            positions.addAll(getSphere(getClosestTargetPos(), smartRange.getValue().floatValue(), range.getValue().intValue()).stream().filter(this::isHole).filter(this::isInRange).collect(Collectors.toList()));
+        } else if (!smart.getValue()) {
+            positions.addAll(getSphere(getPlayerPos(), range.getValue().floatValue(), range.getValue().intValue()).stream().filter(this::isHole).collect(Collectors.toList()));
         }
-        else if (!(boolean)this.smart.getValue()) {
-            positions.addAll((Collection)this.getSphere(this.getPlayerPos(), ((Double)this.range.getValue()).floatValue(), ((Double)this.range.getValue()).intValue()).stream().filter((Predicate<? super Object>)this::isHole).collect((Collector<? super Object, ?, List<? super Object>>)Collectors.toList()));
-        }
-        return (List<BlockPos>)positions;
+        return positions;
     }
-    
-    private List<BlockPos> getSphere(final BlockPos loc, final float r, final int h) {
-        final ArrayList<BlockPos> circleBlocks = new ArrayList<BlockPos>();
-        final int cx = loc.getX();
-        final int cy = loc.getY();
-        final int cz = loc.getZ();
-        for (int x = cx - (int)r; x <= cx + r; ++x) {
-            for (int z = cz - (int)r; z <= cz + r; ++z) {
+
+    private List<BlockPos> getSphere(BlockPos loc, float r, int h) {
+
+        ArrayList<BlockPos> circleBlocks = new ArrayList<>();
+
+        int cx = loc.getX();
+        int cy = loc.getY();
+        int cz = loc.getZ();
+        int x = cx - (int)r;
+
+        while ((float)x <= (float)cx + r) {
+
+            int z = cz - (int)r;
+
+            while ((float)z <= (float)cz + r) {
+
                 int y = cy - (int)r;
+
                 while (true) {
-                    final float f = (float)y;
-                    final float f2 = cy + r;
-                    if (f >= f2) {
-                        break;
-                    }
-                    final double dist = (cx - x) * (cx - x) + (cz - z) * (cz - z) + (cy - y) * (cy - y);
-                    if (dist < r * r) {
-                        final BlockPos l = new BlockPos(x, y, z);
+
+                    float f = y;
+                    float f2 = (float)cy + r;
+
+                    if (!(f < f2)) break;
+
+                    double dist = (cx - x) * (cx - x) + (cz - z) * (cz - z) + ((cy - y) * (cy - y));
+
+                    if (dist < (double) (r * r)) {
+                        BlockPos l = new BlockPos(x, y, z);
                         circleBlocks.add(l);
                     }
                     ++y;
                 }
+                ++z;
             }
+            ++x;
         }
         return circleBlocks;
-    }
-    
-    private enum Logic
-    {
-        PLAYER, 
-        HOLE;
     }
 }

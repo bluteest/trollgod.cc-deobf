@@ -1,79 +1,77 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.api.mixin.mixins.entity;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.client.entity.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.client.entity.EntityPlayerSP;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin({ EntityPlayerSP.class })
-public interface IEntityPlayerSP
-{
-    @Accessor("handActive")
-    void mm_setHandActive(final boolean p0);
-    
-    @Accessor("serverSneakState")
-    void setServerSneakState(final boolean p0);
-    
-    @Accessor("serverSneakState")
-    boolean getServerSneakState();
-    
-    @Accessor("serverSprintState")
-    void setServerSprintState(final boolean p0);
-    
-    @Accessor("serverSprintState")
+@Mixin( value={EntityPlayerSP.class} )
+public interface IEntityPlayerSP {
+
+    @Accessor( "handActive" )
+    void mm_setHandActive(boolean value);
+
+    @Accessor(value = "serverSneakState")
+    void setServerSneakState(boolean serverSneakState);
+
+    @Accessor(value = "serverSneakState")
+    boolean  getServerSneakState();
+
+    @Accessor(value = "serverSprintState")
+    void setServerSprintState(boolean serverSprintState);
+
+    @Accessor(value = "serverSprintState")
     boolean getServerSprintState();
-    
-    @Accessor("prevOnGround")
-    void setPrevOnGround(final boolean p0);
-    
-    @Accessor("prevOnGround")
+
+    @Accessor(value = "prevOnGround")
+    void setPrevOnGround(boolean prevOnGround);
+
+    @Accessor(value = "prevOnGround")
     boolean getPrevOnGround();
-    
-    @Accessor("autoJumpEnabled")
-    void setAutoJumpEnabled(final boolean p0);
-    
-    @Accessor("autoJumpEnabled")
+
+    @Accessor(value = "autoJumpEnabled")
+    void setAutoJumpEnabled(boolean autoJumpEnabled);
+
+    @Accessor(value = "autoJumpEnabled")
     boolean getAutoJumpEnabled();
-    
-    @Accessor("lastReportedPosX")
-    void setLastReportedPosX(final double p0);
-    
-    @Accessor("lastReportedPosX")
+
+    @Accessor(value = "lastReportedPosX")
+    void setLastReportedPosX(double lastReportedPosX);
+
+    @Accessor(value = "lastReportedPosX")
     double getLastReportedPosX();
-    
-    @Accessor("lastReportedPosY")
-    void setLastReportedPosY(final double p0);
-    
-    @Accessor("lastReportedPosY")
+
+    @Accessor(value = "lastReportedPosY")
+    void setLastReportedPosY(double lastReportedPosY);
+
+    @Accessor(value = "lastReportedPosY")
     double getLastReportedPosY();
-    
-    @Accessor("lastReportedPosZ")
-    void setLastReportedPosZ(final double p0);
-    
-    @Accessor("lastReportedPosZ")
+
+    @Accessor(value = "lastReportedPosZ")
+    void setLastReportedPosZ(double lastReportedPosZ);
+
+    @Accessor(value = "lastReportedPosZ")
     double getLastReportedPosZ();
-    
-    @Accessor("lastReportedYaw")
-    void setLastReportedYaw(final float p0);
-    
-    @Accessor("lastReportedYaw")
+
+    @Accessor(value = "lastReportedYaw")
+    void setLastReportedYaw(float lastReportedYaw);
+
+    @Accessor(value = "lastReportedYaw")
     float getLastReportedYaw();
-    
-    @Accessor("lastReportedPitch")
-    void setLastReportedPitch(final float p0);
-    
-    @Accessor("lastReportedPitch")
+
+    @Accessor(value = "lastReportedPitch")
+    void setLastReportedPitch(float lastReportedPitch);
+
+    @Accessor(value = "lastReportedPitch")
     float getLastReportedPitch();
-    
-    @Accessor("positionUpdateTicks")
-    void setPositionUpdateTicks(final int p0);
-    
-    @Accessor("positionUpdateTicks")
+
+    @Accessor(value = "positionUpdateTicks")
+    void setPositionUpdateTicks(int positionUpdateTicks);
+
+    @Accessor(value = "positionUpdateTicks")
     int getPositionUpdateTicks();
-    
-    @Invoker("onUpdateWalkingPlayer")
+
+    @Invoker(value = "onUpdateWalkingPlayer")
     void invokeOnUpdateWalkingPlayer();
+
 }

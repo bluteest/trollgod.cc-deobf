@@ -1,42 +1,46 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\lun\Documents\Minecraft-Deobfuscator3000-1.2.3\1.12 stable mappings"!
 
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.play.other.CPacketChatMessage
+ */
 package me.hollow.realth.client.managers;
 
-import me.hollow.realth.client.command.*;
-import me.hollow.realth.client.events.*;
-import net.minecraft.network.play.client.*;
-import net.b0at.api.event.*;
-import me.hollow.realth.client.modules.other.*;
-import me.hollow.realth.api.util.*;
-import me.hollow.realth.client.command.commands.*;
-import me.hollow.realth.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.util.MessageUtil;
+import me.hollow.realth.client.command.Command;
+import me.hollow.realth.client.command.commands.BindCommand;
+import me.hollow.realth.client.command.commands.DrawnCommand;
+import me.hollow.realth.client.command.commands.FriendCommand;
+import me.hollow.realth.client.command.commands.SaveCommand;
+import me.hollow.realth.client.command.commands.ToggleCommand;
+import me.hollow.realth.client.command.commands.TutorialCommand;
+import me.hollow.realth.client.events.PacketEvent;
+import me.hollow.realth.client.modules.other.ClickGui;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.network.play.client.CPacketChatMessage;
 
-public class CommandManager
-{
-    private final List<Command> commands;
-    
-    public CommandManager() {
-        this.commands = new ArrayList<Command>();
-    }
-    
+public class CommandManager {
+    private final List<Command> commands = new ArrayList<Command>();
+
     @EventHandler
-    public void onSendPacket(final PacketEvent.Send event) {
+    public void onSendPacket(PacketEvent.Send event) {
         if (event.getPacket() instanceof CPacketChatMessage) {
-            this.checkCommands(((CPacketChatMessage)event.getPacket()).getMessage(), (PacketEvent)event);
+            this.checkCommands(((CPacketChatMessage)event.getPacket()).getMessage(), event);
         }
     }
-    
-    private void checkCommands(final String message, final PacketEvent event) {
-        if (message.startsWith((String)ClickGui.getInstance().prefix.getValue())) {
-            final String[] args = message.split(" ");
-            final String input = message.split(" ")[0].substring(1);
-            for (final Command command : this.commands) {
-                if (!input.equalsIgnoreCase(command.getLabel()) && !this.checkAliases(input, command)) {
-                    continue;
-                }
+
+    private void checkCommands(String message, PacketEvent event) {
+        if (message.startsWith(ClickGui.getInstance().prefix.getValue())) {
+            String[] args = message.split(" ");
+            String input = message.split(" ")[0].substring(1);
+            for (Command command : this.commands) {
+                if (!input.equalsIgnoreCase(command.getLabel()) && !this.checkAliases(input, command)) continue;
                 event.cancel();
                 command.execute(args);
             }
@@ -47,22 +51,22 @@ public class CommandManager
             event.cancel();
         }
     }
-    
-    private boolean checkAliases(final String input, final Command command) {
-        for (final String str : command.getAliases()) {
-            if (input.equalsIgnoreCase(str)) {
-                return true;
-            }
+
+    private boolean checkAliases(String input, Command command) {
+        for (String str : command.getAliases()) {
+            if (!input.equalsIgnoreCase(str)) continue;
+            return true;
         }
         return false;
     }
-    
+
     public void init() {
-        this.register((Command)new ToggleCommand(), (Command)new BindCommand(), (Command)new DrawnCommand(), (Command)new FriendCommand(), (Command)new SaveCommand(), (Command)new TutorialCommand());
-        JordoHack.INSTANCE.getEventManager().registerListener((Object)this);
+        this.register(new ToggleCommand(), new BindCommand(), new DrawnCommand(), new FriendCommand(), new SaveCommand(), new TutorialCommand());
+        JordoHack.INSTANCE.getEventManager().registerListener(this);
     }
-    
-    public void register(final Command... command) {
+
+    public void register(Command ... command) {
         Collections.addAll(this.commands, command);
     }
 }
+

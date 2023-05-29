@@ -1,64 +1,81 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\lun\Documents\Minecraft-Deobfuscator3000-1.2.3\1.12 stable mappings"!
 
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.other.audio.ISound
+ *  net.minecraft.other.audio.PositionedSoundRecord
+ *  net.minecraft.init.SoundEvents
+ *  net.minecraft.util.SoundEvent
+ */
 package me.hollow.realth.client.gui.components.items.buttons;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.client.gui.components.items.*;
-import me.hollow.realth.api.property.*;
-import java.util.*;
-import net.minecraft.init.*;
-import net.minecraft.client.audio.*;
+import java.util.ArrayList;
+import java.util.List;
+import me.hollow.realth.api.property.Bind;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.client.gui.components.items.Item;
+import me.hollow.realth.client.gui.components.items.buttons.BindButton;
+import me.hollow.realth.client.gui.components.items.buttons.BooleanButton;
+import me.hollow.realth.client.gui.components.items.buttons.Button;
+import me.hollow.realth.client.gui.components.items.buttons.EnumButton;
+import me.hollow.realth.client.gui.components.items.buttons.Slider;
+import me.hollow.realth.client.gui.components.items.buttons.StringButton;
+import me.hollow.realth.client.gui.components.items.buttons.UnlimitedSlider;
+import me.hollow.realth.client.modules.Module;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.SoundEvent;
 
-public class ModuleButton extends Button
-{
+public class ModuleButton
+extends Button {
     private final Module module;
-    private List<Item> items;
+    private List<Item> items = new ArrayList<Item>();
     private boolean subOpen;
-    
-    public ModuleButton(final Module module) {
+
+    public ModuleButton(Module module) {
         super(module.getLabel());
-        this.items = new ArrayList<Item>();
         this.module = module;
         this.initSettings();
     }
-    
+
     public void initSettings() {
-        final ArrayList<Item> newItems = new ArrayList<Item>();
+        ArrayList<Item> newItems = new ArrayList<Item>();
         if (!this.module.getSettings().isEmpty()) {
-            for (final Setting setting : this.module.getSettings()) {
+            for (Setting setting : this.module.getSettings()) {
                 if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled")) {
-                    newItems.add((Item)new BooleanButton(setting));
+                    newItems.add(new BooleanButton(setting));
                 }
                 if (setting.getValue() instanceof Bind) {
-                    newItems.add((Item)new BindButton(setting));
+                    newItems.add(new BindButton(setting));
                 }
                 if (setting.getValue() instanceof String || setting.getValue() instanceof Character) {
-                    newItems.add((Item)new StringButton(setting));
+                    newItems.add(new StringButton(setting));
                 }
                 if (setting.isNumberSetting()) {
                     if (setting.hasRestriction()) {
-                        newItems.add((Item)new Slider(setting));
+                        newItems.add(new Slider(setting));
                         continue;
                     }
-                    newItems.add((Item)new UnlimitedSlider(setting));
+                    newItems.add(new UnlimitedSlider(setting));
                 }
-                if (!setting.isEnumSetting()) {
-                    continue;
-                }
-                newItems.add((Item)new EnumButton(setting));
+                if (!setting.isEnumSetting()) continue;
+                newItems.add(new EnumButton(setting));
             }
         }
         this.items = newItems;
     }
-    
-    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (!this.items.isEmpty() && this.subOpen) {
             float height = 1.0f;
-            for (int size = this.items.size(), i = 0; i < size; ++i) {
-                final Item item = this.items.get(i);
+            int size = this.items.size();
+            for (int i = 0; i < size; ++i) {
+                Item item = this.items.get(i);
                 if (!item.isHidden()) {
                     item.setLocation(this.x + 1.0f, this.y + (height += 15.0f));
                     item.setHeight(15);
@@ -69,60 +86,60 @@ public class ModuleButton extends Button
             }
         }
     }
-    
-    public void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) {
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if (!this.items.isEmpty()) {
             if (mouseButton == 1 && this.isHovering(mouseX, mouseY)) {
                 this.subOpen = !this.subOpen;
-                ModuleButton.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_ANVIL_FALL, 10.0f));
+                mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord((SoundEvent)SoundEvents.BLOCK_ANVIL_FALL, (float)10.0f));
             }
             if (this.subOpen) {
-                for (final Item item : this.items) {
-                    if (item.isHidden()) {
-                        continue;
-                    }
+                for (Item item : this.items) {
+                    if (item.isHidden()) continue;
                     item.mouseClicked(mouseX, mouseY, mouseButton);
                 }
             }
         }
     }
-    
-    public void onKeyTyped(final char typedChar, final int keyCode) {
+
+    @Override
+    public void onKeyTyped(char typedChar, int keyCode) {
         super.onKeyTyped(typedChar, keyCode);
         if (!this.items.isEmpty() && this.subOpen) {
-            for (final Item item : this.items) {
-                if (item.isHidden()) {
-                    continue;
-                }
+            for (Item item : this.items) {
+                if (item.isHidden()) continue;
                 item.onKeyTyped(typedChar, keyCode);
             }
         }
     }
-    
+
+    @Override
     public int getHeight() {
         if (this.subOpen) {
             int height = 14;
-            for (final Item item : this.items) {
-                if (item.isHidden()) {
-                    continue;
-                }
+            for (Item item : this.items) {
+                if (item.isHidden()) continue;
                 height += item.getHeight() + 1;
             }
             return height + 2;
         }
         return 14;
     }
-    
+
     public Module getModule() {
         return this.module;
     }
-    
+
+    @Override
     public void toggle() {
         this.module.toggle();
     }
-    
+
+    @Override
     public boolean getState() {
         return this.module.isEnabled();
     }
 }
+

@@ -1,19 +1,22 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.play.other.CPacketUseEntity
+ *  net.minecraft.network.play.other.CPacketUseEntity$Action
+ */
 package me.hollow.realth.api.mixin.mixins.network;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.network.play.client.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.network.play.client.CPacketUseEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ CPacketUseEntity.class })
-public interface ICPacketUseEntity
-{
-    @Accessor("entityId")
-    void setEntityId(final int p0);
-    
-    @Accessor("action")
-    void setAction(final CPacketUseEntity.Action p0);
+@Mixin(value={CPacketUseEntity.class})
+public interface ICPacketUseEntity {
+    @Accessor(value="entityId")
+    public void setEntityId(int var1);
+
+    @Accessor(value="action")
+    public void setAction(CPacketUseEntity.Action var1);
 }
+

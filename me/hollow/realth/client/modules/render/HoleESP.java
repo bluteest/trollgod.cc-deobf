@@ -1,127 +1,111 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\lun\Documents\Minecraft-Deobfuscator3000-1.2.3\1.12 stable mappings"!
 
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.Block
+ *  net.minecraft.init.Blocks
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3i
+ */
 package me.hollow.realth.client.modules.render;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import java.util.*;
-import me.hollow.realth.client.events.*;
-import net.b0at.api.event.*;
-import java.awt.*;
-import me.hollow.realth.api.util.*;
-import net.minecraft.init.*;
-import net.minecraft.util.math.*;
-import net.minecraft.block.*;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.BlockUtil;
+import me.hollow.realth.api.util.CombatUtil;
+import me.hollow.realth.api.util.RenderUtil;
+import me.hollow.realth.client.events.TickEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
-@ModuleManifest(label = "HoleEsp", category = Module.Category.RENDER)
-public class HoleESP extends Module
-{
-    public final Setting<Page> page;
-    public final Setting<Float> range;
-    public final Setting<Boolean> fade;
-    public final Setting<Float> fadeRange;
-    protected final Setting<Float> minFade;
-    private final Setting<Boolean> outline;
-    private final Setting<Boolean> box;
-    public final Setting<Boolean> down;
-    public final Setting<Boolean> wireframe;
-    public final Setting<Float> size;
-    private final Setting<Integer> obsidianRed;
-    private final Setting<Integer> obsidianGreen;
-    private final Setting<Integer> obsidianBlue;
-    private final Setting<Integer> obsidianAlpha;
-    public final Setting<Integer> bedRockRed;
-    public final Setting<Integer> bedRockGreen;
-    public final Setting<Integer> bedRockBlue;
-    public final Setting<Integer> bedRockAlpha;
-    private final BlockPos[] surroundOffset;
-    public List<BlockPos> holes;
-    
-    public HoleESP() {
-        this.page = (Setting<Page>)this.register(new Setting("Page", (Object)Page.MISC));
-        this.range = (Setting<Float>)this.register(new Setting("Range", (Object)5.0f, (Object)1.0f, (Object)16.0f, v -> this.page.getValue() == Page.MISC));
-        this.fade = (Setting<Boolean>)this.register(new Setting("Fade", (Object)false, v -> this.page.getValue() == Page.FADE));
-        this.fadeRange = (Setting<Float>)this.register(new Setting("Fade Range", (Object)4.0f, (Object)0.0f, (Object)100.0f, v -> this.page.getValue() == Page.FADE));
-        this.minFade = (Setting<Float>)this.register(new Setting("Min Fade", (Object)3.0f, (Object)0.0f, (Object)100.0f, v -> this.page.getValue() == Page.FADE));
-        this.outline = (Setting<Boolean>)this.register(new Setting("Outline", (Object)false, v -> this.page.getValue() == Page.MISC));
-        this.box = (Setting<Boolean>)this.register(new Setting("Box", (Object)false, v -> this.page.getValue() == Page.MISC));
-        this.down = (Setting<Boolean>)this.register(new Setting("Down", (Object)false, v -> this.page.getValue() == Page.MISC));
-        this.wireframe = (Setting<Boolean>)this.register(new Setting("Wireframe", (Object)true, v -> this.page.getValue() == Page.MISC));
-        this.size = (Setting<Float>)this.register(new Setting("Size", (Object)1.0f, (Object)0.0f, (Object)1.0f, v -> this.page.getValue() == Page.MISC));
-        this.obsidianRed = (Setting<Integer>)this.register(new Setting("O-Red", (Object)255, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.obsidianGreen = (Setting<Integer>)this.register(new Setting("O-Green", (Object)0, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.obsidianBlue = (Setting<Integer>)this.register(new Setting("O-Blue", (Object)0, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.obsidianAlpha = (Setting<Integer>)this.register(new Setting("O-Alpha", (Object)40, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.bedRockRed = (Setting<Integer>)this.register(new Setting("B-Red", (Object)0, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.bedRockGreen = (Setting<Integer>)this.register(new Setting("B-Green", (Object)0, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.bedRockBlue = (Setting<Integer>)this.register(new Setting("B-Blue", (Object)255, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.bedRockAlpha = (Setting<Integer>)this.register(new Setting("B-Alpha", (Object)40, (Object)0, (Object)255, v -> this.page.getValue() == Page.COLOR));
-        this.surroundOffset = BlockUtil.toBlockPos(BlockUtil.getOffsets(0, true));
-        this.holes = new ArrayList<BlockPos>();
-    }
-    
+@ModuleManifest(label="HoleEsp", category=Module.Category.RENDER)
+public class HoleESP
+extends Module {
+    public final Setting<Page> page = this.register(new Setting<Page>("Page", Page.MISC));
+    public final Setting<Float> range = this.register(new Setting<Float>("Range", Float.valueOf(5.0f), Float.valueOf(1.0f), Float.valueOf(16.0f), v -> this.page.getValue() == Page.MISC));
+    public final Setting<Boolean> fade = this.register(new Setting<Boolean>("Fade" , false, v-> this.page.getValue() == Page.FADE));
+    public final Setting<Float> fadeRange = this.register(new Setting<Float>("Fade Range", 4.0f, 0.0f, 100.0f, v-> this.page.getValue() == Page.FADE));
+    protected final Setting<Float> minFade = this.register(new Setting<Float>("Min Fade", 3.0f, 0.0f, 100.0f, v-> this.page.getValue() == Page.FADE));
+    private final Setting<Boolean> outline = register(new Setting<>("Outline", false, v -> page.getValue() == Page.MISC));
+    private final Setting<Boolean> box = register(new Setting<>("Box", false, v -> page.getValue() == Page.MISC));
+    public final Setting<Boolean> down = this.register(new Setting<Boolean>("Down", Boolean.valueOf(false), v -> this.page.getValue() == Page.MISC));
+    public final Setting<Boolean> wireframe = this.register(new Setting<Boolean>("Wireframe", Boolean.valueOf(true), v -> this.page.getValue() == Page.MISC));
+    public final Setting<Float> size = this.register(new Setting<Float>("Size", Float.valueOf(1.0f), Float.valueOf(0.0f), Float.valueOf(1.0f), v -> this.page.getValue() == Page.MISC));
+    private final Setting<Integer> obsidianRed = this.register(new Setting<Integer>("O-Red", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    private final Setting<Integer> obsidianGreen = this.register(new Setting<Integer>("O-Green", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    private final Setting<Integer> obsidianBlue = this.register(new Setting<Integer>("O-Blue", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    private final Setting<Integer> obsidianAlpha = this.register(new Setting<Integer>("O-Alpha", Integer.valueOf(40), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    public final Setting<Integer> bedRockRed = this.register(new Setting<Integer>("B-Red", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    public final Setting<Integer> bedRockGreen = this.register(new Setting<Integer>("B-Green", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    public final Setting<Integer> bedRockBlue = this.register(new Setting<Integer>("B-Blue", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    public final Setting<Integer> bedRockAlpha = this.register(new Setting<Integer>("B-Alpha", Integer.valueOf(40), Integer.valueOf(0), Integer.valueOf(255), v -> this.page.getValue() == Page.COLOR));
+    private final BlockPos[] surroundOffset = BlockUtil.toBlockPos(BlockUtil.getOffsets(0, true));
+    public List<BlockPos> holes = new ArrayList<BlockPos>();
+
     @EventHandler
-    public void onTick(final TickEvent event) {
-        if (event.getStage() == 0 || HoleESP.mc.player == null || HoleESP.mc.world == null) {
+    public void onTick(TickEvent event) {
+        if (event.getStage() == 0 || this.mc.player == null || this.mc.world == null) {
             return;
         }
         this.holes = this.calcHoles();
     }
-    
+
+    @Override
     public void onRender3D() {
-        for (int size = this.holes.size(), i = 0; i < size; ++i) {
-            final BlockPos pos = this.holes.get(i);
-            final Color color = this.isSafe(pos) ? new Color((int)this.bedRockRed.getValue(), (int)this.bedRockGreen.getValue(), (int)this.bedRockBlue.getValue()) : new Color((int)this.obsidianRed.getValue(), (int)this.obsidianGreen.getValue(), (int)this.obsidianBlue.getValue());
-            RenderUtil.drawBoxESP(((boolean)this.down.getValue()) ? pos.down() : pos, color, 1.0f, (boolean)this.outline.getValue(), (boolean)this.box.getValue(), this.isSafe(pos) ? ((int)this.bedRockAlpha.getValue()) : ((int)this.obsidianAlpha.getValue()), (float)this.size.getValue());
-            if (this.wireframe.getValue()) {
-                RenderUtil.renderCrosses(((boolean)this.down.getValue()) ? pos.down() : pos, this.isSafe(pos) ? new Color((int)this.bedRockRed.getValue(), (int)this.bedRockGreen.getValue(), (int)this.bedRockBlue.getValue()) : new Color((int)this.obsidianRed.getValue(), (int)this.obsidianGreen.getValue(), (int)this.obsidianBlue.getValue()), 1.0f);
-            }
+        int size = this.holes.size();
+        for (int i = 0; i < size; ++i) {
+            BlockPos pos = this.holes.get(i);
+            final Color color = isSafe(pos) ? new Color(bedRockRed.getValue(), bedRockGreen.getValue(), bedRockBlue.getValue()) : new Color(obsidianRed.getValue(), obsidianGreen.getValue(), obsidianBlue.getValue());
+            RenderUtil.drawBoxESP(this.down.getValue() != false ? pos.down() : pos, color, 1, outline.getValue(), box.getValue(), this.isSafe(pos) ? bedRockAlpha.getValue() : obsidianAlpha.getValue(), this.size.getValue().floatValue());
+            if (!this.wireframe.getValue().booleanValue()) continue;
+            RenderUtil.renderCrosses(this.down.getValue() != false ? pos.down() : pos, this.isSafe(pos) ? new Color(this.bedRockRed.getValue(), this.bedRockGreen.getValue(), this.bedRockBlue.getValue()) : new Color(this.obsidianRed.getValue(), this.obsidianGreen.getValue(), this.obsidianBlue.getValue()), 1.0f);
         }
     }
-    
+
     public List<BlockPos> calcHoles() {
-        final ArrayList<BlockPos> safeSpots = new ArrayList<BlockPos>();
-        final List<BlockPos> positions = (List<BlockPos>)BlockUtil.getSphere((float)this.range.getValue(), false);
-        for (int size = positions.size(), i = 0; i < size; ++i) {
-            final BlockPos pos = positions.get(i);
-            if (HoleESP.mc.world.getBlockState(pos).getBlock().equals(Blocks.AIR) && HoleESP.mc.world.getBlockState(pos.add(0, 1, 0)).getBlock().equals(Blocks.AIR)) {
-                if (HoleESP.mc.world.getBlockState(pos.add(0, 2, 0)).getBlock().equals(Blocks.AIR)) {
-                    boolean isSafe = true;
-                    for (final BlockPos offset : this.surroundOffset) {
-                        final Block block = HoleESP.mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
-                        if (block != Blocks.BEDROCK) {
-                            if (block != Blocks.OBSIDIAN) {
-                                isSafe = false;
-                            }
-                        }
-                    }
-                    if (isSafe) {
-                        safeSpots.add(pos);
-                    }
-                }
+        ArrayList<BlockPos> safeSpots = new ArrayList<BlockPos>();
+        List<BlockPos> positions = BlockUtil.getSphere(this.range.getValue().floatValue(), false);
+        int size = positions.size();
+        for (int i = 0; i < size; ++i) {
+            BlockPos pos = positions.get(i);
+            if (!this.mc.world.getBlockState(pos).getBlock().equals((Object)Blocks.AIR) || !this.mc.world.getBlockState(pos.add(0, 1, 0)).getBlock().equals((Object)Blocks.AIR) || !this.mc.world.getBlockState(pos.add(0, 2, 0)).getBlock().equals((Object)Blocks.AIR)) continue;
+            boolean isSafe = true;
+            for (BlockPos offset : this.surroundOffset) {
+                Block block = this.mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
+                if (block == Blocks.BEDROCK || block == Blocks.OBSIDIAN) continue;
+                isSafe = false;
             }
+            if (!isSafe) continue;
+            safeSpots.add(pos);
         }
         return safeSpots;
     }
-    
-    private boolean isSafe(final BlockPos pos) {
+
+    private boolean isSafe(BlockPos pos) {
         boolean isSafe = true;
-        for (final BlockPos offset : this.surroundOffset) {
-            final Block block = HoleESP.mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
-            if (block != Blocks.BEDROCK) {
-                isSafe = false;
-                break;
-            }
+        for (BlockPos offset : this.surroundOffset) {
+            Block block = mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
+            if (block == Blocks.BEDROCK) continue;
+            isSafe = false;
+            break;
         }
         return isSafe;
     }
-    
-    public enum Page
-    {
-        COLOR, 
-        MISC, 
-        FADE;
+
+    public enum Page {
+        COLOR,
+        MISC,
+        FADE
+
     }
 }
+

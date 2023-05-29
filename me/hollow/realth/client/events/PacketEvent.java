@@ -1,35 +1,38 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.Packet
+ */
 package me.hollow.realth.client.events;
 
-import net.b0at.api.event.*;
-import net.minecraft.network.*;
+import net.b0at.api.event.Event;
+import net.minecraft.network.Packet;
 
-public class PacketEvent extends Event
-{
+public class PacketEvent
+extends Event {
     public final Packet packet;
-    
-    public PacketEvent(final Packet packet) {
+
+    public PacketEvent(Packet packet) {
         this.packet = packet;
     }
-    
+
     public Packet getPacket() {
         return this.packet;
     }
-    
-    public static class Send extends PacketEvent
-    {
-        public Send(final Packet packet) {
+
+    public static class Send
+    extends PacketEvent {
+        public Send(Packet packet) {
             super(packet);
         }
     }
-    
-    public static class Receive extends PacketEvent
-    {
-        public Receive(final Packet packet) {
+
+    public static class Receive
+    extends PacketEvent {
+        public Receive(Packet packet) {
             super(packet);
         }
     }
 }
+

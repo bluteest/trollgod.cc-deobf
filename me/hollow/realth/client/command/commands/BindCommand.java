@@ -1,29 +1,34 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  org.lwjgl.input.Keyboard
+ */
 package me.hollow.realth.client.command.commands;
 
-import me.hollow.realth.client.command.*;
-import me.hollow.realth.api.util.*;
-import me.hollow.realth.*;
-import org.lwjgl.input.*;
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.client.modules.*;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.property.Bind;
+import me.hollow.realth.api.util.MessageUtil;
+import me.hollow.realth.client.command.Command;
+import me.hollow.realth.client.command.CommandManifest;
+import me.hollow.realth.client.modules.Module;
+import org.lwjgl.input.Keyboard;
 
-@CommandManifest(label = "Bind", aliases = { "b" })
-public class BindCommand extends Command
-{
-    public void execute(final String[] args) {
+@CommandManifest(label="Bind", aliases={"b"})
+public class BindCommand
+extends Command {
+    @Override
+    public void execute(String[] args) {
         if (args.length < 2) {
             MessageUtil.sendClientMessage("Use the command like this -> (module, bind)", true);
             return;
         }
-        final Module module = JordoHack.INSTANCE.getModuleManager().getModuleByLabel(args[1]);
+        Module module = JordoHack.INSTANCE.getModuleManager().getModuleByLabel(args[1]);
         if (module != null) {
-            final int index = Keyboard.getKeyIndex(args[2].toUpperCase());
-            module.bind.setValue((Object)new Bind(index));
-            MessageUtil.sendClientMessage(module.getLabel() + " has been bound to " + Keyboard.getKeyName(index), false);
+            int index = Keyboard.getKeyIndex((String)args[2].toUpperCase());
+            module.bind.setValue(new Bind(index));
+            MessageUtil.sendClientMessage(module.getLabel() + " has been bound to " + Keyboard.getKeyName((int)index), false);
         }
     }
 }
+

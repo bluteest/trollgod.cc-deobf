@@ -1,37 +1,32 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.modules.render;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import java.awt.*;
+import java.awt.Color;
 
-@ModuleManifest(label = "GlintModify", category = Module.Category.RENDER, listen = false)
-public class GlintModify extends Module
-{
-    public final Setting<Integer> red;
-    public final Setting<Integer> green;
-    public final Setting<Integer> blue;
-    private static GlintModify INSTANCE;
-    
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+
+@ModuleManifest(label="GlintModify", category=Module.Category.RENDER, listen=false)
+public class GlintModify
+extends Module {
+    public final Setting<Integer> red = this.register(new Setting<Object>("Red", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255)));
+    public final Setting<Integer> green = this.register(new Setting<Object>("Green", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255)));
+    public final Setting<Integer> blue = this.register(new Setting<Object>("Blue", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255)));
+    private static GlintModify INSTANCE = new GlintModify();
+
     public GlintModify() {
-        this.red = (Setting<Integer>)this.register(new Setting("Red", (Object)255, (Object)0, (Object)255));
-        this.green = (Setting<Integer>)this.register(new Setting("Green", (Object)255, (Object)0, (Object)255));
-        this.blue = (Setting<Integer>)this.register(new Setting("Blue", (Object)255, (Object)0, (Object)255));
-        GlintModify.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     public static GlintModify getINSTANCE() {
-        return GlintModify.INSTANCE;
+        return INSTANCE;
     }
-    
+
     public int getColor() {
-        return new Color(new Color((int)this.red.getValue(), (int)this.green.getValue(), (int)this.blue.getValue()).getRGB()).getRGB();
-    }
-    
-    static {
-        GlintModify.INSTANCE = new GlintModify();
+        return new Color(new Color(this.red.getValue(), this.green.getValue(), this.blue.getValue()).getRGB()).getRGB();
     }
 }
+

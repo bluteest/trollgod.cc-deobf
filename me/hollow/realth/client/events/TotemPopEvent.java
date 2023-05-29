@@ -1,21 +1,24 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.player.EntityPlayer
+ */
 package me.hollow.realth.client.events;
 
-import net.b0at.api.event.*;
-import net.minecraft.entity.player.*;
+import net.b0at.api.event.Event;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class TotemPopEvent extends Event
-{
+public class TotemPopEvent extends Event {
+
     private final EntityPlayer entity;
-    
-    public TotemPopEvent(final EntityPlayer entity) {
+
+    public TotemPopEvent(EntityPlayer entity) {
         this.entity = entity;
     }
-    
+
     public EntityPlayer getEntity() {
-        return this.entity;
+        return entity;
     }
 }
+

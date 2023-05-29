@@ -1,55 +1,75 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.Gson
+ *  com.google.gson.GsonBuilder
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonObject
+ *  com.google.gson.JsonParser
+ */
 package me.hollow.realth.client.managers;
 
-import me.hollow.realth.client.modules.*;
-import java.util.stream.*;
-import java.nio.file.attribute.*;
-import java.nio.file.*;
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.*;
-import com.google.gson.*;
-import java.io.*;
-import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.property.Bind;
+import me.hollow.realth.api.property.EnumConverter;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.client.modules.Module;
 
-public class ConfigManager
-{
-    public final ArrayList<Module> features;
-    public String config;
-    
-    public ConfigManager() {
-        this.features = new ArrayList<Module>();
-        this.config = "TrollGod/config/";
-    }
-    
-    public void loadConfig(final String name) {
-        final List<File> files = Arrays.stream((Object[])Objects.requireNonNull((T[])new File("TrollGod").listFiles())).filter(File::isDirectory).collect((Collector<? super Object, ?, List<File>>)Collectors.toList());
+public class ConfigManager {
+    public final ArrayList<Module> features = new ArrayList();
+    public String config = "TrollGod/config/";
+
+    public void loadConfig(String name) {
+        final List<File> files = Arrays.stream(Objects.requireNonNull(new File("TrollGod").listFiles())).filter(File::isDirectory).collect(Collectors.toList());
         if (files.contains(new File("TrollGod/" + name + "/"))) {
             this.config = "TrollGod/" + name + "/";
-        }
-        else {
+        } else {
             this.config = "TrollGod/config/";
         }
-        for (final Module module : this.features) {
+        for (Module module : this.features) {
             try {
-                this.loadSettings(module);
-            }
-            catch (IOException e) {
+                loadSettings(module);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        this.saveCurrentConfig();
+        saveCurrentConfig();
     }
-    
-    public void saveConfig(final String name) {
+
+    public void saveConfig(String name) {
         this.config = "TrollGod/" + name + "/";
-        final File path = new File(this.config);
+        File path = new File(this.config);
         if (!path.exists()) {
             path.mkdir();
         }
-        for (final Module feature : this.features) {
+        for (Module feature : this.features) {
             try {
                 this.saveSettings(feature);
             }
@@ -59,20 +79,19 @@ public class ConfigManager
         }
         this.saveCurrentConfig();
     }
-    
+
     public void saveCurrentConfig() {
-        final File currentConfig = new File("TrollGod/currentconfig.txt");
+        File currentConfig = new File("TrollGod/currentconfig.txt");
         try {
             if (currentConfig.exists()) {
-                final FileWriter writer = new FileWriter(currentConfig);
-                final String tempConfig = this.config.replaceAll("/", "");
+                FileWriter writer = new FileWriter(currentConfig);
+                String tempConfig = this.config.replaceAll("/", "");
                 writer.write(tempConfig.replaceAll("TrollGod", ""));
                 writer.close();
-            }
-            else {
+            } else {
                 currentConfig.createNewFile();
-                final FileWriter writer = new FileWriter(currentConfig);
-                final String tempConfig = this.config.replaceAll("/", "");
+                FileWriter writer = new FileWriter(currentConfig);
+                String tempConfig = this.config.replaceAll("/", "");
                 writer.write(tempConfig.replaceAll("TrollGod", ""));
                 writer.close();
             }
@@ -81,13 +100,13 @@ public class ConfigManager
             e.printStackTrace();
         }
     }
-    
+
     public String loadCurrentConfig() {
-        final File currentConfig = new File("TrollGod/currentconfig.txt");
+        File currentConfig = new File("TrollGod/currentconfig.txt");
         String name = "config";
         try {
             if (currentConfig.exists()) {
-                final Scanner reader = new Scanner(currentConfig);
+                Scanner reader = new Scanner(currentConfig);
                 while (reader.hasNextLine()) {
                     name = reader.nextLine();
                 }
@@ -99,145 +118,139 @@ public class ConfigManager
         }
         return name;
     }
-    
-    public void saveSettings(final Module feature) throws IOException {
-        final JsonObject object = new JsonObject();
-        final File directory = new File(this.config + this.getDirectory(feature));
+
+    public void saveSettings(Module feature) throws IOException {
+        String featureName;
+        Path outputFile;
+        JsonObject object = new JsonObject();
+        File directory = new File(this.config + this.getDirectory(feature));
         if (!directory.exists()) {
             directory.mkdir();
         }
-        final String featureName;
-        final Path outputFile;
         if (!Files.exists(outputFile = Paths.get(featureName = this.config + this.getDirectory(feature) + feature.getLabel() + ".json", new String[0]), new LinkOption[0])) {
-            Files.createFile(outputFile, (FileAttribute<?>[])new FileAttribute[0]);
+            Files.createFile(outputFile, new FileAttribute[0]);
         }
-        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final String json = gson.toJson((JsonElement)this.writeSettings(feature));
-        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(outputFile, new OpenOption[0])));
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson((JsonElement)this.writeSettings(feature));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(outputFile, new OpenOption[0])));
         writer.write(json);
         writer.close();
     }
-    
-    public static void setValueFromJson(final Module feature, final Setting setting, final JsonElement element) {
+
+    public static void setValueFromJson(Module feature, Setting setting, JsonElement element) {
         if (setting.getName().equals("Enabled")) {
             if (element.getAsBoolean()) {
                 feature.setEnabled(true);
             }
             return;
         }
-        final String type = setting.getType();
-        switch (type) {
+        switch (setting.getType()) {
             case "Boolean": {
-                setting.setValue((Object)element.getAsBoolean());
+                setting.setValue(element.getAsBoolean());
                 break;
             }
             case "Double": {
-                setting.setValue((Object)element.getAsDouble());
+                setting.setValue(element.getAsDouble());
                 break;
             }
             case "Float": {
-                setting.setValue((Object)element.getAsFloat());
+                setting.setValue(Float.valueOf(element.getAsFloat()));
                 break;
             }
             case "Integer": {
-                setting.setValue((Object)element.getAsInt());
+                setting.setValue(element.getAsInt());
                 break;
             }
             case "String": {
-                final String str = element.getAsString();
-                setting.setValue((Object)str.replace("_", " "));
+                String str = element.getAsString();
+                setting.setValue(str.replace("_", " "));
                 break;
             }
             case "Bind": {
-                setting.setValue((Object)new Bind.BindConverter().doBackward(element));
+                setting.setValue(new Bind.BindConverter().doBackward(element));
                 break;
             }
             case "Enum": {
                 try {
-                    final EnumConverter converter = new EnumConverter((Class)((Enum)setting.getValue()).getClass());
-                    final Enum value = converter.doBackward(element);
-                    setting.setValue((value == null) ? setting.getDefaultValue() : value);
+                    EnumConverter converter = new EnumConverter(((Enum)setting.getValue()).getClass());
+                    Enum value = converter.doBackward(element);
+                    setting.setValue(value == null ? setting.getDefaultValue() : value);
                 }
-                catch (Exception ex) {}
+                catch (Exception e) {}
                 break;
             }
         }
     }
-    
+
     public void init() {
         this.features.addAll(JordoHack.INSTANCE.getModuleManager().getModules());
-        final String name = this.loadCurrentConfig();
+        String name = this.loadCurrentConfig();
         this.loadConfig(name);
     }
-    
-    private void loadSettings(final Module feature) throws IOException {
-        final String featureName = this.config + this.getDirectory(feature) + feature.getLabel() + ".json";
-        final Path featurePath = Paths.get(featureName, new String[0]);
+
+    private void loadSettings(Module feature) throws IOException {
+        String featureName = this.config + this.getDirectory(feature) + feature.getLabel() + ".json";
+        Path featurePath = Paths.get(featureName, new String[0]);
         if (!Files.exists(featurePath, new LinkOption[0])) {
             return;
         }
         this.loadPath(featurePath, feature);
     }
-    
-    private void loadPath(final Path path, final Module feature) throws IOException {
-        final InputStream stream = Files.newInputStream(path, new OpenOption[0]);
+
+    private void loadPath(Path path, Module feature) throws IOException {
+        InputStream stream = Files.newInputStream(path, new OpenOption[0]);
         try {
-            loadFile(new JsonParser().parse((Reader)new InputStreamReader(stream)).getAsJsonObject(), feature);
+            ConfigManager.loadFile(new JsonParser().parse((Reader)new InputStreamReader(stream)).getAsJsonObject(), feature);
         }
         catch (IllegalStateException e) {
-            loadFile(new JsonObject(), feature);
+            ConfigManager.loadFile(new JsonObject(), feature);
         }
         stream.close();
     }
-    
-    private static void loadFile(final JsonObject input, final Module feature) {
-        for (final Map.Entry entry : input.entrySet()) {
-            final String settingName = entry.getKey();
-            final JsonElement element = entry.getValue();
+
+    private static void loadFile(JsonObject input, Module feature) {
+        for (Map.Entry entry : input.entrySet()) {
+            String settingName = (String)entry.getKey();
+            JsonElement element = (JsonElement)entry.getValue();
             boolean settingFound = false;
-            for (final Setting setting : feature.getSettings()) {
-                if (!settingName.equals(setting.getName())) {
-                    continue;
-                }
+            for (Setting setting : feature.getSettings()) {
+                if (!settingName.equals(setting.getName())) continue;
                 try {
-                    setValueFromJson(feature, setting, element);
+                    ConfigManager.setValueFromJson(feature, setting, element);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
                 }
                 settingFound = true;
             }
-            if (!settingFound) {
-                continue;
-            }
+            if (!settingFound) continue;
         }
     }
-    
-    public JsonObject writeSettings(final Module feature) {
-        final JsonObject object = new JsonObject();
-        final JsonParser jp = new JsonParser();
-        for (final Setting setting : feature.getSettings()) {
+
+    public JsonObject writeSettings(Module feature) {
+        JsonObject object = new JsonObject();
+        JsonParser jp = new JsonParser();
+        for (Setting setting : feature.getSettings()) {
             if (setting.isEnumSetting()) {
-                final EnumConverter converter = new EnumConverter((Class)((Enum)setting.getValue()).getClass());
+                EnumConverter converter = new EnumConverter(((Enum)setting.getValue()).getClass());
                 object.add(setting.getName(), converter.doForward((Enum)setting.getValue()));
+                continue;
             }
-            else {
-                if (setting.isStringSetting()) {
-                    final String str = (String)setting.getValue();
-                    setting.setValue((Object)str.replace(" ", "_"));
-                }
-                try {
-                    object.add(setting.getName(), jp.parse(setting.getValueAsString()));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if (setting.isStringSetting()) {
+                String str = (String)setting.getValue();
+                setting.setValue(str.replace(" ", "_"));
+            }
+            try {
+                object.add(setting.getName(), jp.parse(setting.getValueAsString()));
+            }
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return object;
     }
-    
-    public String getDirectory(final Module feature) {
+
+    public String getDirectory(Module feature) {
         String directory = "";
         if (feature instanceof Module) {
             directory = directory + feature.getCategory().getLabel() + "/";
@@ -245,3 +258,4 @@ public class ConfigManager
         return directory;
     }
 }
+

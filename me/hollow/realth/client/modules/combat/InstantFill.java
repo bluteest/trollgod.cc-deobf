@@ -1,134 +1,131 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\lun\Documents\Minecraft-Deobfuscator3000-1.2.3\1.12 stable mappings"!
 
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.Block
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.init.Blocks
+ *  net.minecraft.item.Item
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.other.CPacketHeldItemChange
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3i
+ */
 package me.hollow.realth.client.modules.combat;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.client.events.*;
-import net.minecraft.init.*;
-import net.minecraft.item.*;
-import net.minecraft.network.play.client.*;
-import net.minecraft.network.*;
-import net.minecraft.entity.player.*;
-import net.b0at.api.event.*;
-import me.hollow.realth.api.util.*;
-import java.util.function.*;
-import java.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.block.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
-@ModuleManifest(label = "InstantFill", category = Category.COMBAT)
-public class InstantFill extends Module
-{
-    private final Setting<Integer> delay;
-    private final Setting<Integer> bpt;
-    private final Setting<Float> range;
-    private final Setting<Float> distance;
-    private static final BlockPos[] surroundOffset;
-    private final Timer timer;
-    private int placeAmount;
-    private int blockSlot;
-    
-    public InstantFill() {
-        this.delay = (Setting<Integer>)this.register(new Setting("Delay", (Object)50, (Object)0, (Object)300));
-        this.bpt = (Setting<Integer>)this.register(new Setting("Blocks/Tick", (Object)10, (Object)1, (Object)20));
-        this.range = (Setting<Float>)this.register(new Setting("Range", (Object)5.0f, (Object)1.0f, (Object)6.0f));
-        this.distance = (Setting<Float>)this.register(new Setting("Distance", (Object)4.0f, (Object)1.0f, (Object)7.0f));
-        this.timer = new Timer();
-        this.placeAmount = 0;
-        this.blockSlot = -1;
-    }
-    
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.*;
+import me.hollow.realth.client.events.UpdateEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketHeldItemChange;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+
+@ModuleManifest(label="InstantFill", category=Module.Category.COMBAT)
+public class InstantFill
+extends Module {
+    private final Setting<Integer> delay = this.register(new Setting<Integer>("Delay", 50, 0, 300));
+    private final Setting<Integer> bpt = this.register(new Setting<Integer>("Blocks/Tick", 10, 1, 20));
+    private final Setting<Float> range = this.register(new Setting<Float>("Range", Float.valueOf(5.0f), Float.valueOf(1.0f), Float.valueOf(6.0f)));
+    private final Setting<Float> distance = this.register(new Setting<Float>("Distance", Float.valueOf(4.0f), Float.valueOf(1.0f), Float.valueOf(7.0f)));
+    private static final BlockPos[] surroundOffset = BlockUtil.toBlockPos(BlockUtil.getOffsets(0, true));
+    private final Timer timer = new Timer();
+    private int placeAmount = 0;
+    private int blockSlot = -1;
+
     @EventHandler
-    public void onUpdate(final UpdateEvent event) {
+    public void onUpdate(UpdateEvent event) {
         if (this.check()) {
-            final EntityPlayer currentTarget = CombatUtil.getTarget(10.0f);
+            EntityPlayer currentTarget = CombatUtil.getTarget(10.0f);
             if (currentTarget == null) {
                 return;
             }
             if (CombatUtil.isInHole(currentTarget)) {
                 return;
             }
-            final List<BlockPos> holes = this.getHoles(currentTarget);
+            List<BlockPos> holes = this.getHoles(currentTarget);
             if (holes.size() == 0) {
                 this.toggle();
                 return;
             }
-            final int lastSlot = InstantFill.mc.player.inventory.currentItem;
-            this.blockSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock(Blocks.OBSIDIAN));
+            int lastSlot = mc.player.inventory.currentItem;
+            this.blockSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock((Block)Blocks.OBSIDIAN));
             if (this.blockSlot == -1) {
                 this.toggle();
                 return;
             }
             BlockPos hole = null;
-            for (final BlockPos pos : this.getHoles(currentTarget)) {
-                if (currentTarget.getDistance((double)pos.getX(), (double)pos.getY(), (double)pos.getZ()) >= (float)this.distance.getValue()) {
-                    continue;
-                }
+            for (BlockPos pos : this.getHoles(currentTarget)) {
+                if (!(currentTarget.getDistance((double)pos.getX(), (double)pos.getY(), (double)pos.getZ()) < (double)this.distance.getValue())) continue;
                 hole = pos;
             }
             if (hole != null) {
-                InstantFill.mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(this.blockSlot));
+                mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(this.blockSlot));
                 this.placeBlock(hole);
-                InstantFill.mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(lastSlot));
+                mc.getConnection().sendPacket((Packet)new CPacketHeldItemChange(lastSlot));
             }
         }
     }
-    
-    private void placeBlock(final BlockPos pos) {
-        if ((int)this.bpt.getValue() > this.placeAmount) {
-            BlockUtil.placeBlock(pos, false);
-            ++this.placeAmount;
+
+    private void placeBlock(BlockPos pos) {
+        if (this.bpt.getValue() > this.placeAmount) {
+
+                BlockUtil.placeBlock(pos, false);
+                ++this.placeAmount;
+
         }
     }
-    
+
     private boolean check() {
-        if (InstantFill.mc.player == null || InstantFill.mc.world == null) {
+        if (mc.player == null || mc.world == null) {
             return false;
         }
         this.placeAmount = 0;
-        this.blockSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock(Blocks.OBSIDIAN));
+        this.blockSlot = ItemUtil.getItemFromHotbar(Item.getItemFromBlock((Block)Blocks.OBSIDIAN));
         if (this.blockSlot == -1) {
             MessageUtil.sendClientMessage("<HoleFiller> No Obsidian, Toggling!", -22221);
             this.toggle();
         }
-        return this.timer.hasReached((long)(int)this.delay.getValue());
+        return this.timer.hasReached(delay.getValue());
     }
-    
-    public final List<BlockPos> getHoles(final EntityPlayer player) {
-        final List<BlockPos> holes = this.calcHoles();
-        holes.sort(Comparator.comparingDouble((ToDoubleFunction<? super BlockPos>)player::getDistanceSq));
+
+    public final List<BlockPos> getHoles(EntityPlayer player) {
+        List<BlockPos> holes = this.calcHoles();
+        holes.sort(Comparator.comparingDouble(((EntityPlayer)player)::getDistanceSq));
         return holes;
     }
-    
+
     public List<BlockPos> calcHoles() {
-        final ArrayList<BlockPos> safeSpots = new ArrayList<BlockPos>();
-        final List<BlockPos> positions = (List<BlockPos>)BlockUtil.getSphere((float)this.range.getValue(), false);
+        ArrayList<BlockPos> safeSpots = new ArrayList<BlockPos>();
+        List<BlockPos> positions = BlockUtil.getSphere(range.getValue(), false);
         for (int i = 0; i < positions.size(); ++i) {
-            final BlockPos pos = positions.get(i);
-            if (BlockUtil.isPositionPlaceable(pos, true) != 1 && InstantFill.mc.world.getBlockState(pos).getBlock().equals(Blocks.AIR) && InstantFill.mc.world.getBlockState(pos.add(0, 1, 0)).getBlock().equals(Blocks.AIR)) {
-                if (InstantFill.mc.world.getBlockState(pos.add(0, 2, 0)).getBlock().equals(Blocks.AIR)) {
-                    boolean isSafe = true;
-                    for (final BlockPos offset : InstantFill.surroundOffset) {
-                        final Block block = InstantFill.mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
-                        if (block != Blocks.BEDROCK && block != Blocks.OBSIDIAN && block != Blocks.ENDER_CHEST) {
-                            if (block != Blocks.ANVIL) {
-                                isSafe = false;
-                            }
-                        }
-                    }
-                    if (isSafe) {
-                        safeSpots.add(pos);
-                    }
-                }
+            BlockPos pos = positions.get(i);
+            if (BlockUtil.isPositionPlaceable(pos, true) == 1 || !mc.world.getBlockState(pos).getBlock().equals((Object)Blocks.AIR) || !mc.world.getBlockState(pos.add(0, 1, 0)).getBlock().equals((Object)Blocks.AIR) || !mc.world.getBlockState(pos.add(0, 2, 0)).getBlock().equals((Object)Blocks.AIR)) continue;
+            boolean isSafe = true;
+            for (BlockPos offset : surroundOffset) {
+                Block block = mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
+                if (block == Blocks.BEDROCK || block == Blocks.OBSIDIAN || block == Blocks.ENDER_CHEST || block == Blocks.ANVIL) continue;
+                isSafe = false;
             }
+            if (!isSafe) continue;
+            safeSpots.add(pos);
         }
         return safeSpots;
     }
-    
-    static {
-        surroundOffset = BlockUtil.toBlockPos(BlockUtil.getOffsets(0, true));
-    }
 }
+

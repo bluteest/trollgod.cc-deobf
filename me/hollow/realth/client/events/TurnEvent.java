@@ -1,28 +1,24 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.events;
 
-import net.b0at.api.event.*;
-import net.minecraftforge.fml.common.eventhandler.*;
+import net.b0at.api.event.Event;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 @Cancelable
-public class TurnEvent extends Event
-{
+public class TurnEvent extends Event {
+
     private final float yaw;
     private final float pitch;
-    
-    public TurnEvent(final float yaw, final float pitch) {
+
+    public TurnEvent(float yaw, float pitch) {
         this.yaw = yaw;
         this.pitch = pitch;
     }
-    
+
     public float getYaw() {
-        return this.yaw;
+        return yaw;
     }
-    
+
     public float getPitch() {
-        return this.pitch;
+        return pitch;
     }
 }

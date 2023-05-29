@@ -1,17 +1,14 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.api.mixin.mixins.render;
 
-import org.spongepowered.asm.mixin.*;
-import java.util.*;
-import net.minecraft.client.renderer.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.client.renderer.DestroyBlockProgress;
+import net.minecraft.client.renderer.RenderGlobal;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ RenderGlobal.class })
-public interface IRenderGlobal
-{
+import java.util.Map;
+
+@Mixin(RenderGlobal.class)
+public interface IRenderGlobal {
     @Accessor("damagedBlocks")
     Map<Integer, DestroyBlockProgress> getDamagedBlocks();
 }

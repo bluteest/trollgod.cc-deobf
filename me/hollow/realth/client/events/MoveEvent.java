@@ -1,46 +1,46 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.events;
 
-import net.b0at.api.event.*;
-import net.minecraftforge.fml.common.eventhandler.*;
+import net.b0at.api.event.Event;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+
 
 @Cancelable
-public class MoveEvent extends Event
-{
-    private double motionX;
-    private double motionY;
-    private double motionZ;
-    
-    public MoveEvent(final double motionX, final double motionY, final double motionZ) {
+public class MoveEvent extends Event {
+
+    private double motionX, motionY, motionZ;
+
+    public MoveEvent(double motionX, double motionY, double motionZ) {
         this.motionX = motionX;
         this.motionY = motionY;
         this.motionZ = motionZ;
     }
-    
     public double getMotionX() {
-        return this.motionX;
+        return motionX;
     }
-    
+
     public double getMotionY() {
-        return this.motionY;
+        return motionY;
     }
-    
+
     public double getMotionZ() {
-        return this.motionZ;
+        return motionZ;
     }
-    
-    public void setMotionX(final double motionX) {
+
+
+    public void setMotionX(double motionX) {
         this.motionX = motionX;
     }
-    
-    public void setMotionY(final double motionY) {
+
+    public void setMotionY(double motionY) {
         this.motionY = motionY;
     }
-    
-    public void setMotionZ(final double motionZ) {
+
+    public void setMotionZ(double motionZ) {
         this.motionZ = motionZ;
     }
+
 }
+

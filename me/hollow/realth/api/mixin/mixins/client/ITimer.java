@@ -1,19 +1,21 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.util.Timer
+ */
 package me.hollow.realth.api.mixin.mixins.client;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.util.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.util.Timer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ Timer.class })
-public interface ITimer
-{
+@Mixin(Timer.class)
+public interface ITimer {
     @Accessor("tickLength")
     float getTickLength();
-    
+
     @Accessor("tickLength")
-    void setTickLength(final float p0);
+    void setTickLength(float tickLength);
 }
+

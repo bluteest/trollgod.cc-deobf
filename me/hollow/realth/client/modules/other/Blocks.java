@@ -1,44 +1,42 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.modules.other;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.*;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
 
-@ModuleManifest(label = "Blocks", category = Module.Category.OTHER, listen = false, enabled = true)
-public class Blocks extends Module
-{
-    public final Setting<String> font;
-    private static Blocks INSTANCE;
-    
+@ModuleManifest(label="Blocks", category=Module.Category.OTHER, listen=false, enabled = true)
+public class Blocks
+extends Module {
+    public final Setting<String> font = this.register(new Setting<String>("Font", "Verdana"));
+    private static Blocks INSTANCE = new Blocks();
+
     public Blocks() {
-        this.font = (Setting<String>)this.register(new Setting("Font", (Object)"Verdana"));
         this.setInstance();
     }
-    
+
     private void setInstance() {
-        Blocks.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     public static Blocks getInstance() {
-        if (Blocks.INSTANCE == null) {
-            Blocks.INSTANCE = new Blocks();
+        if (INSTANCE == null) {
+            INSTANCE = new Blocks();
         }
-        return Blocks.INSTANCE;
+        return INSTANCE;
     }
-    
+
+    @Override
     public void onEnable() {
         JordoHack.fontManager.setCustomFont(true);
     }
-    
+
+    @Override
     public void onDisable() {
         JordoHack.fontManager.setCustomFont(false);
     }
-    
-    static {
-        Blocks.INSTANCE = new Blocks();
-    }
 }
+

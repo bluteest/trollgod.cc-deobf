@@ -1,13 +1,17 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.player.EntityPlayer
+ */
 package me.hollow.realth.api.mixin.mixins.entity;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.entity.player.*;
+import me.hollow.realth.api.mixin.mixins.entity.MixinEntity;
+import net.minecraft.entity.player.EntityPlayer;
+import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin({ EntityPlayer.class })
-public abstract class MixinEntityPlayer extends MixinEntity
-{
+@Mixin(value={EntityPlayer.class})
+public abstract class MixinEntityPlayer
+extends MixinEntity {
 }
+

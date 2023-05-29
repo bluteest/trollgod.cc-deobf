@@ -1,56 +1,57 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.modules.misc;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import net.minecraft.client.network.*;
-import net.minecraft.scoreboard.*;
-import com.mojang.realmsclient.gui.*;
-import me.hollow.realth.*;
+import com.mojang.realmsclient.gui.ChatFormatting;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.scoreboard.Team;
 
-@ModuleManifest(label = "ExtraTab", category = Category.MISC, listen = false)
-public class ExtraTab extends Module
-{
-    public Setting<Boolean> pingDisplay;
-    public Setting<Boolean> coloredPing;
-    public Setting<Integer> size;
-    private static ExtraTab INSTANCE;
-    
+@ModuleManifest(label="ExtraTab", category=Module.Category.MISC, listen=false)
+public class ExtraTab
+extends Module {
+    public Setting<Boolean> pingDisplay = this.register(new Setting<Boolean>("Ping", true));
+    public Setting<Boolean> coloredPing = this.register(new Setting<Boolean>("Colored", true));
+    public Setting<Integer> size = this.register(new Setting<Integer>("Size", 250, 1, 1000));
+    private static ExtraTab INSTANCE = new ExtraTab();
+
     public ExtraTab() {
-        this.pingDisplay = (Setting<Boolean>)this.register(new Setting("Ping", (Object)true));
-        this.coloredPing = (Setting<Boolean>)this.register(new Setting("Colored", (Object)true));
-        this.size = (Setting<Integer>)this.register(new Setting("Size", (Object)250, (Object)1, (Object)1000));
-        ExtraTab.INSTANCE = this;
+        INSTANCE = this;
     }
-    
-    public static String getPlayerName(final NetworkPlayerInfo networkPlayerInfo) {
-        final String string = (networkPlayerInfo.getDisplayName() != null) ? networkPlayerInfo.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName((Team)networkPlayerInfo.getPlayerTeam(), networkPlayerInfo.getGameProfile().getName());
-        final String prefix = "";
+
+    public static String getPlayerName(NetworkPlayerInfo networkPlayerInfo) {
+        String string = networkPlayerInfo.getDisplayName() != null ? networkPlayerInfo.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName((Team)networkPlayerInfo.getPlayerTeam(), (String)networkPlayerInfo.getGameProfile().getName());
+        String prefix = "";
         String k = "";
-        if (networkPlayerInfo.getDisplayName() != null) {
+        if(networkPlayerInfo.getDisplayName() != null) {
             k = networkPlayerInfo.getDisplayName().getUnformattedText();
         }
-        else {
+        else
+        {
             k = networkPlayerInfo.getGameProfile().getName();
         }
-        if (getINSTANCE().pingDisplay.getValue()) {
-            if (!(boolean)getINSTANCE().coloredPing.getValue()) {
-                return prefix + string + ChatFormatting.GRAY + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
-            }
-            if (networkPlayerInfo.getResponseTime() <= 50) {
-                return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.GREEN + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : (prefix + string + ChatFormatting.GREEN + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : ""));
-            }
-            if (networkPlayerInfo.getResponseTime() <= 100) {
-                return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.GOLD + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : (prefix + string + ChatFormatting.GOLD + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : ""));
-            }
-            if (networkPlayerInfo.getResponseTime() <= 150) {
-                return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.RED + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : (prefix + string + ChatFormatting.RED + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : ""));
-            }
-            if (networkPlayerInfo.getResponseTime() <= 9999) {
-                return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.DARK_RED + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : (prefix + string + ChatFormatting.DARK_RED + " " + (((boolean)getINSTANCE().pingDisplay.getValue()) ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : ""));
+        if (ExtraTab.getINSTANCE().pingDisplay.getValue().booleanValue()) {
+            if (ExtraTab.getINSTANCE().coloredPing.getValue().booleanValue()) {
+                if (networkPlayerInfo.getResponseTime() <= 50) {
+                    return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.GREEN + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : prefix + string + ChatFormatting.GREEN + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
+                }
+                if (networkPlayerInfo.getResponseTime() <= 100) {
+                    return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.GOLD + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : prefix + string + ChatFormatting.GOLD + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
+                }
+                if (networkPlayerInfo.getResponseTime() <= 150) {
+                    return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.RED + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : prefix + string + ChatFormatting.RED + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
+                }
+                if (networkPlayerInfo.getResponseTime() <= 9999) {
+                    return JordoHack.INSTANCE.getFriendManager().isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.DARK_RED + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : prefix + string + ChatFormatting.DARK_RED + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
+                }
+                //OyVey.friendManager.isFriend(string) ? (prefix + ChatFormatting.AQUA + string + ChatFormatting.DARK_RED + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "")) : prefix + string + ChatFormatting.DARK_RED + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
+            } else {
+                return prefix + string + ChatFormatting.GRAY + " " + (ExtraTab.getINSTANCE().pingDisplay.getValue() != false ? Integer.valueOf(networkPlayerInfo.getResponseTime()) : "");
             }
         }
         if (JordoHack.INSTANCE.getFriendManager().isFriend(string)) {
@@ -58,19 +59,16 @@ public class ExtraTab extends Module
         }
         return prefix + string;
     }
-    
+
     public static ExtraTab getINSTANCE() {
-        if (ExtraTab.INSTANCE == null) {
-            ExtraTab.INSTANCE = new ExtraTab();
+        if (INSTANCE == null) {
+            INSTANCE = new ExtraTab();
         }
-        return ExtraTab.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        ExtraTab.INSTANCE = this;
-    }
-    
-    static {
-        ExtraTab.INSTANCE = new ExtraTab();
+        INSTANCE = this;
     }
 }
+

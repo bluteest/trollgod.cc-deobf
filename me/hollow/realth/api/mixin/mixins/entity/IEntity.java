@@ -1,16 +1,19 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.Entity
+ */
 package me.hollow.realth.api.mixin.mixins.entity;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.entity.*;
-import org.spongepowered.asm.mixin.gen.*;
+import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ Entity.class })
-public interface IEntity
-{
-    @Accessor("isInWeb")
-    boolean getIsInWeb();
+@Mixin(value={Entity.class})
+public interface IEntity {
+    @Accessor(value="isInWeb")
+    public boolean getIsInWeb();
+
 }
+

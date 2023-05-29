@@ -1,23 +1,23 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.command.commands;
 
-import me.hollow.realth.client.command.*;
-import me.hollow.realth.*;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.client.command.Command;
+import me.hollow.realth.client.command.CommandManifest;
 
-@CommandManifest(label = "Friend", aliases = { "friends", "friend" })
-public class FriendCommand extends Command
-{
-    public void execute(final String[] args) {
+@CommandManifest(label="Friend", aliases={"friends", "friend"})
+public class FriendCommand
+extends Command {
+    @Override
+    public void execute(String[] args) {
         if (args.length < 2) {
             return;
         }
         try {
-            final String name = args[2];
-            final String upperCase = args[1].toUpperCase();
-            switch (upperCase) {
+            String name = args[2];
+            switch (args[1].toUpperCase()) {
                 case "ADD": {
                     JordoHack.INSTANCE.getFriendManager().addFriend(name);
                     break;
@@ -36,10 +36,12 @@ public class FriendCommand extends Command
                 }
                 case "INSIDE": {
                     JordoHack.INSTANCE.getFriendManager().clearFriends();
-                    break;
                 }
             }
         }
-        catch (Exception ex) {}
+        catch (Exception exception) {
+            // empty catch block
+        }
     }
 }
+

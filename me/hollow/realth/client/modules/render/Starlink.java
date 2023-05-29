@@ -1,293 +1,279 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.render;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import io.netty.util.internal.*;
-import java.util.*;
-import net.minecraft.network.play.server.*;
-import me.hollow.realth.api.util.*;
-import net.b0at.api.event.*;
-import net.minecraftforge.fml.common.eventhandler.*;
-import me.hollow.realth.client.events.*;
-import me.hollow.realth.*;
-import net.minecraft.entity.player.*;
+import io.netty.util.internal.ConcurrentSet;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.MessageUtil;
+import me.hollow.realth.api.util.Timer;
+import me.hollow.realth.client.events.ConnectionEvent;
+import me.hollow.realth.client.events.PacketEvent;
+import me.hollow.realth.client.events.TotemPopEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.server.SPacketChat;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@ModuleManifest(label = "Starlink", category = Module.Category.RENDER, listen = false)
-public class Starlink extends Module
-{
-    private static Starlink INSTANCE;
-    public Setting<Boolean> ignore;
-    public Setting<Boolean> lag;
-    public Setting<Integer> pop_delay;
-    private final Timer timer;
-    protected final Set<String> sent;
-    public List<String> unicodeChars;
-    
-    public Starlink() {
-        this.ignore = (Setting<Boolean>)this.register(new Setting("Ignore", (Object)true));
-        this.lag = (Setting<Boolean>)this.register(new Setting("Botnet", (Object)false));
-        this.pop_delay = (Setting<Integer>)this.register(new Setting("Delay", (Object)2500, (Object)0, (Object)10000, v -> (boolean)this.lag.getValue()));
-        this.timer = new Timer();
-        this.sent = (Set<String>)new ConcurrentSet();
-        this.unicodeChars = new ArrayList<String>();
-    }
-    
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+@ModuleManifest(label="Starlink", category= Module.Category.RENDER, listen=false)
+public class Starlink extends Module {
+    private static Starlink INSTANCE = new Starlink();
+    public Setting<Boolean> ignore = this.register(new Setting<Boolean>("Ignore", true));
+    public Setting<Boolean> lag = this.register(new Setting<Boolean>("Botnet", false));
+    public Setting<Integer> pop_delay = this.register(new Setting<Integer>("Delay", 2500, 0, 10000, v -> this.lag.getValue()));
+    private final Timer timer = new Timer();
+    protected final Set<String> sent = new ConcurrentSet<>();
+    public List<String> unicodeChars = new ArrayList<>();
+
     public String getUnicodeMessage() {
-        final StringBuffer sb = new StringBuffer();
-        for (final String u : this.unicodeChars) {
+        StringBuffer sb = new StringBuffer();
+        for (String u : unicodeChars) {
             sb.append(u);
         }
         return sb.toString();
     }
-    
-    public boolean hasUnicode(final String message) {
-        for (final String u : this.unicodeChars) {
+
+    public boolean hasUnicode(String message) {
+        for (String u : unicodeChars) {
             if (message.contains(u)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public void onLoad() {
-        this.unicodeChars.add("\u0101");
-        this.unicodeChars.add("\u0201");
-        this.unicodeChars.add("\u0301");
-        this.unicodeChars.add("\u0401");
-        this.unicodeChars.add("\u0601");
-        this.unicodeChars.add("\u0701");
-        this.unicodeChars.add("\u0801");
-        this.unicodeChars.add("\u0901");
-        this.unicodeChars.add("\u0a01");
-        this.unicodeChars.add("\u0b01");
-        this.unicodeChars.add("\u0e01");
-        this.unicodeChars.add("\u0f01");
-        this.unicodeChars.add("\u1001");
-        this.unicodeChars.add("\u1101");
-        this.unicodeChars.add("\u1201");
-        this.unicodeChars.add("\u1301");
-        this.unicodeChars.add("\u1401");
-        this.unicodeChars.add("\u1501");
-        this.unicodeChars.add("\u1601");
-        this.unicodeChars.add("\u1701");
-        this.unicodeChars.add("\u1801");
-        this.unicodeChars.add("\u1901");
-        this.unicodeChars.add("\u1a01");
-        this.unicodeChars.add("\u1b01");
-        this.unicodeChars.add("\u1c01");
-        this.unicodeChars.add("\u1d01");
-        this.unicodeChars.add("\u1e01");
-        this.unicodeChars.add("\u1f01");
-        this.unicodeChars.add("\u2101");
-        this.unicodeChars.add("\u2201");
-        this.unicodeChars.add("\u2301");
-        this.unicodeChars.add("\u2401");
-        this.unicodeChars.add("\u2501");
-        this.unicodeChars.add("\u2701");
-        this.unicodeChars.add("\u2801");
-        this.unicodeChars.add("\u2901");
-        this.unicodeChars.add("\u2a01");
-        this.unicodeChars.add("\u2b01");
-        this.unicodeChars.add("\u2c01");
-        this.unicodeChars.add("\u2d01");
-        this.unicodeChars.add("\u2e01");
-        this.unicodeChars.add("\u2f01");
-        this.unicodeChars.add("\u3001");
-        this.unicodeChars.add("\u3101");
-        this.unicodeChars.add("\u3201");
-        this.unicodeChars.add("\u3301");
-        this.unicodeChars.add("\u3401");
-        this.unicodeChars.add("\u3501");
-        this.unicodeChars.add("\u3601");
-        this.unicodeChars.add("\u3701");
-        this.unicodeChars.add("\u3801");
-        this.unicodeChars.add("\u3901");
-        this.unicodeChars.add("\u3a01");
-        this.unicodeChars.add("\u3b01");
-        this.unicodeChars.add("\u3c01");
-        this.unicodeChars.add("\u3d01");
-        this.unicodeChars.add("\u3e01");
-        this.unicodeChars.add("\u3f01");
-        this.unicodeChars.add("\u4001");
-        this.unicodeChars.add("\u4101");
-        this.unicodeChars.add("\u4201");
-        this.unicodeChars.add("\u4301");
-        this.unicodeChars.add("\u4401");
-        this.unicodeChars.add("\u4501");
-        this.unicodeChars.add("\u4601");
-        this.unicodeChars.add("\u4701");
-        this.unicodeChars.add("\u4801");
-        this.unicodeChars.add("\u4901");
-        this.unicodeChars.add("\u4a01");
-        this.unicodeChars.add("\u4b01");
-        this.unicodeChars.add("\u4c01");
-        this.unicodeChars.add("\u4d01");
-        this.unicodeChars.add("\u4e01");
-        this.unicodeChars.add("\u4f01");
-        this.unicodeChars.add("\u5001");
-        this.unicodeChars.add("\u5101");
-        this.unicodeChars.add("\u5201");
-        this.unicodeChars.add("\u5301");
-        this.unicodeChars.add("\u5401");
-        this.unicodeChars.add("\u5501");
-        this.unicodeChars.add("\u5601");
-        this.unicodeChars.add("\u5701");
-        this.unicodeChars.add("\u5801");
-        this.unicodeChars.add("\u5901");
-        this.unicodeChars.add("\u5a01");
-        this.unicodeChars.add("\u5b01");
-        this.unicodeChars.add("\u5c01");
-        this.unicodeChars.add("\u5d01");
-        this.unicodeChars.add("\u5e01");
-        this.unicodeChars.add("\u5f01");
-        this.unicodeChars.add("\u6001");
-        this.unicodeChars.add("\u6101");
-        this.unicodeChars.add("\u6201");
-        this.unicodeChars.add("\u6301");
-        this.unicodeChars.add("\u6401");
-        this.unicodeChars.add("\u6501");
-        this.unicodeChars.add("\u6601");
-        this.unicodeChars.add("\u6701");
-        this.unicodeChars.add("\u6801");
-        this.unicodeChars.add("\u6901");
-        this.unicodeChars.add("\u6a01");
-        this.unicodeChars.add("\u6b01");
-        this.unicodeChars.add("\u6c01");
-        this.unicodeChars.add("\u6d01");
-        this.unicodeChars.add("\u6e01");
-        this.unicodeChars.add("\u6f01");
-        this.unicodeChars.add("\u7001");
-        this.unicodeChars.add("\u7101");
-        this.unicodeChars.add("\u7201");
-        this.unicodeChars.add("\u7301");
-        this.unicodeChars.add("\u7401");
-        this.unicodeChars.add("\u7501");
-        this.unicodeChars.add("\u7601");
-        this.unicodeChars.add("\u7701");
-        this.unicodeChars.add("\u7801");
-        this.unicodeChars.add("\u7901");
-        this.unicodeChars.add("\u7a01");
-        this.unicodeChars.add("\u7b01");
-        this.unicodeChars.add("\u7c01");
-        this.unicodeChars.add("\u7d01");
-        this.unicodeChars.add("\u7e01");
-        this.unicodeChars.add("\u7f01");
-        this.unicodeChars.add("\u8001");
-        this.unicodeChars.add("\u8101");
-        this.unicodeChars.add("\u8201");
-        this.unicodeChars.add("\u8301");
-        this.unicodeChars.add("\u8401");
-        this.unicodeChars.add("\u8501");
-        this.unicodeChars.add("\u8601");
-        this.unicodeChars.add("\u8701");
-        this.unicodeChars.add("\u8801");
-        this.unicodeChars.add("\u8901");
-        this.unicodeChars.add("\u8a01");
-        this.unicodeChars.add("\u8b01");
-        this.unicodeChars.add("\u8c01");
-        this.unicodeChars.add("\u8d01");
-        this.unicodeChars.add("\u8e01");
-        this.unicodeChars.add("\u8f01");
-        this.unicodeChars.add("\u9001");
-        this.unicodeChars.add("\u9101");
-        this.unicodeChars.add("\u9201");
-        this.unicodeChars.add("\u9301");
-        this.unicodeChars.add("\u9401");
-        this.unicodeChars.add("\u9501");
-        this.unicodeChars.add("\u9601");
-        this.unicodeChars.add("\u9701");
-        this.unicodeChars.add("\u9801");
-        this.unicodeChars.add("\u9901");
-        this.unicodeChars.add("\u9a01");
-        this.unicodeChars.add("\u9b01");
-        this.unicodeChars.add("\u9c01");
-        this.unicodeChars.add("\u9d01");
-        this.unicodeChars.add("\u9e01");
-        this.unicodeChars.add("\u9f01");
-        this.unicodeChars.add("\ua001");
-        this.unicodeChars.add("\ua101");
-        this.unicodeChars.add("\ua201");
-        this.unicodeChars.add("\ua301");
-        this.unicodeChars.add("\ua401");
-        this.unicodeChars.add("\ua501");
-        this.unicodeChars.add("\ua601");
-        this.unicodeChars.add("\ua701");
-        this.unicodeChars.add("\ua801");
-        this.unicodeChars.add("\ua901");
-        this.unicodeChars.add("\uaa01");
-        this.unicodeChars.add("\uab01");
-        this.unicodeChars.add("\uac01");
-        this.unicodeChars.add("\uad01");
-        this.unicodeChars.add("\uae01");
-        this.unicodeChars.add("\uaf01");
-        this.unicodeChars.add("\ub001");
-        this.unicodeChars.add("\ub101");
-        this.unicodeChars.add("\ub201");
-        this.unicodeChars.add("\ub301");
-        this.unicodeChars.add("\ub401");
-        this.unicodeChars.add("\ub501");
-        this.unicodeChars.add("\ub601");
-        this.unicodeChars.add("\ub701");
-        this.unicodeChars.add("\ub801");
-        this.unicodeChars.add("\ub901");
-        this.unicodeChars.add("\uba01");
-        this.unicodeChars.add("\ubb01");
-        this.unicodeChars.add("\ubc01");
-        this.unicodeChars.add("\ubd01");
+        unicodeChars.add("\u0101");
+        unicodeChars.add("\u0201");
+        unicodeChars.add("\u0301");
+        unicodeChars.add("\u0401");
+        unicodeChars.add("\u0601");
+        unicodeChars.add("\u0701");
+        unicodeChars.add("\u0801");
+        unicodeChars.add("\u0901");
+        unicodeChars.add("\u0A01");
+        unicodeChars.add("\u0B01");
+        unicodeChars.add("\u0E01");
+        unicodeChars.add("\u0F01");
+        unicodeChars.add("\u1001");
+        unicodeChars.add("\u1101");
+        unicodeChars.add("\u1201");
+        unicodeChars.add("\u1301");
+        unicodeChars.add("\u1401");
+        unicodeChars.add("\u1501");
+        unicodeChars.add("\u1601");
+        unicodeChars.add("\u1701");
+        unicodeChars.add("\u1801");
+        unicodeChars.add("\u1901");
+        unicodeChars.add("\u1A01");
+        unicodeChars.add("\u1B01");
+        unicodeChars.add("\u1C01");
+        unicodeChars.add("\u1D01");
+        unicodeChars.add("\u1E01");
+        unicodeChars.add("\u1F01");
+        unicodeChars.add("\u2101");
+        unicodeChars.add("\u2201");
+        unicodeChars.add("\u2301");
+        unicodeChars.add("\u2401");
+        unicodeChars.add("\u2501");
+        unicodeChars.add("\u2701");
+        unicodeChars.add("\u2801");
+        unicodeChars.add("\u2901");
+        unicodeChars.add("\u2A01");
+        unicodeChars.add("\u2B01");
+        unicodeChars.add("\u2C01");
+        unicodeChars.add("\u2D01");
+        unicodeChars.add("\u2E01");
+        unicodeChars.add("\u2F01");
+        unicodeChars.add("\u3001");
+        unicodeChars.add("\u3101");
+        unicodeChars.add("\u3201");
+        unicodeChars.add("\u3301");
+        unicodeChars.add("\u3401");
+        unicodeChars.add("\u3501");
+        unicodeChars.add("\u3601");
+        unicodeChars.add("\u3701");
+        unicodeChars.add("\u3801");
+        unicodeChars.add("\u3901");
+        unicodeChars.add("\u3A01");
+        unicodeChars.add("\u3B01");
+        unicodeChars.add("\u3C01");
+        unicodeChars.add("\u3D01");
+        unicodeChars.add("\u3E01");
+        unicodeChars.add("\u3F01");
+        unicodeChars.add("\u4001");
+        unicodeChars.add("\u4101");
+        unicodeChars.add("\u4201");
+        unicodeChars.add("\u4301");
+        unicodeChars.add("\u4401");
+        unicodeChars.add("\u4501");
+        unicodeChars.add("\u4601");
+        unicodeChars.add("\u4701");
+        unicodeChars.add("\u4801");
+        unicodeChars.add("\u4901");
+        unicodeChars.add("\u4A01");
+        unicodeChars.add("\u4B01");
+        unicodeChars.add("\u4C01");
+        unicodeChars.add("\u4D01");
+        unicodeChars.add("\u4E01");
+        unicodeChars.add("\u4F01");
+        unicodeChars.add("\u5001");
+        unicodeChars.add("\u5101");
+        unicodeChars.add("\u5201");
+        unicodeChars.add("\u5301");
+        unicodeChars.add("\u5401");
+        unicodeChars.add("\u5501");
+        unicodeChars.add("\u5601");
+        unicodeChars.add("\u5701");
+        unicodeChars.add("\u5801");
+        unicodeChars.add("\u5901");
+        unicodeChars.add("\u5A01");
+        unicodeChars.add("\u5B01");
+        unicodeChars.add("\u5C01");
+        unicodeChars.add("\u5D01");
+        unicodeChars.add("\u5E01");
+        unicodeChars.add("\u5F01");
+        unicodeChars.add("\u6001");
+        unicodeChars.add("\u6101");
+        unicodeChars.add("\u6201");
+        unicodeChars.add("\u6301");
+        unicodeChars.add("\u6401");
+        unicodeChars.add("\u6501");
+        unicodeChars.add("\u6601");
+        unicodeChars.add("\u6701");
+        unicodeChars.add("\u6801");
+        unicodeChars.add("\u6901");
+        unicodeChars.add("\u6A01");
+        unicodeChars.add("\u6B01");
+        unicodeChars.add("\u6C01");
+        unicodeChars.add("\u6D01");
+        unicodeChars.add("\u6E01");
+        unicodeChars.add("\u6F01");
+        unicodeChars.add("\u7001");
+        unicodeChars.add("\u7101");
+        unicodeChars.add("\u7201");
+        unicodeChars.add("\u7301");
+        unicodeChars.add("\u7401");
+        unicodeChars.add("\u7501");
+        unicodeChars.add("\u7601");
+        unicodeChars.add("\u7701");
+        unicodeChars.add("\u7801");
+        unicodeChars.add("\u7901");
+        unicodeChars.add("\u7A01");
+        unicodeChars.add("\u7B01");
+        unicodeChars.add("\u7C01");
+        unicodeChars.add("\u7D01");
+        unicodeChars.add("\u7E01");
+        unicodeChars.add("\u7F01");
+        unicodeChars.add("\u8001");
+        unicodeChars.add("\u8101");
+        unicodeChars.add("\u8201");
+        unicodeChars.add("\u8301");
+        unicodeChars.add("\u8401");
+        unicodeChars.add("\u8501");
+        unicodeChars.add("\u8601");
+        unicodeChars.add("\u8701");
+        unicodeChars.add("\u8801");
+        unicodeChars.add("\u8901");
+        unicodeChars.add("\u8A01");
+        unicodeChars.add("\u8B01");
+        unicodeChars.add("\u8C01");
+        unicodeChars.add("\u8D01");
+        unicodeChars.add("\u8E01");
+        unicodeChars.add("\u8F01");
+        unicodeChars.add("\u9001");
+        unicodeChars.add("\u9101");
+        unicodeChars.add("\u9201");
+        unicodeChars.add("\u9301");
+        unicodeChars.add("\u9401");
+        unicodeChars.add("\u9501");
+        unicodeChars.add("\u9601");
+        unicodeChars.add("\u9701");
+        unicodeChars.add("\u9801");
+        unicodeChars.add("\u9901");
+        unicodeChars.add("\u9A01");
+        unicodeChars.add("\u9B01");
+        unicodeChars.add("\u9C01");
+        unicodeChars.add("\u9D01");
+        unicodeChars.add("\u9E01");
+        unicodeChars.add("\u9F01");
+        unicodeChars.add("\uA001");
+        unicodeChars.add("\uA101");
+        unicodeChars.add("\uA201");
+        unicodeChars.add("\uA301");
+        unicodeChars.add("\uA401");
+        unicodeChars.add("\uA501");
+        unicodeChars.add("\uA601");
+        unicodeChars.add("\uA701");
+        unicodeChars.add("\uA801");
+        unicodeChars.add("\uA901");
+        unicodeChars.add("\uAA01");
+        unicodeChars.add("\uAB01");
+        unicodeChars.add("\uAC01");
+        unicodeChars.add("\uAD01");
+        unicodeChars.add("\uAE01");
+        unicodeChars.add("\uAF01");
+        unicodeChars.add("\uB001");
+        unicodeChars.add("\uB101");
+        unicodeChars.add("\uB201");
+        unicodeChars.add("\uB301");
+        unicodeChars.add("\uB401");
+        unicodeChars.add("\uB501");
+        unicodeChars.add("\uB601");
+        unicodeChars.add("\uB701");
+        unicodeChars.add("\uB801");
+        unicodeChars.add("\uB901");
+        unicodeChars.add("\uBA01");
+        unicodeChars.add("\uBB01");
+        unicodeChars.add("\uBC01");
+        unicodeChars.add("\uBD01");
     }
-    
+
+
     public static Starlink getInstance() {
-        if (Starlink.INSTANCE == null) {
-            Starlink.INSTANCE = new Starlink();
+        if (INSTANCE == null) {
+            INSTANCE = new Starlink();
         }
-        return Starlink.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        Starlink.INSTANCE = this;
+        INSTANCE = this;
     }
-    
-    public void onDisable() {
-        this.sent.clear();
-    }
-    
-    public void onLogout() {
-        this.sent.clear();
-    }
-    
+    @Override
+    public void onDisable () { this.sent.clear(); }
+    public void onLogout () { this.sent.clear(); }
+
     @EventHandler
-    public void onReceive(final PacketEvent.Receive e) {
-        if (e.getPacket() instanceof SPacketChat && (boolean)this.ignore.getValue()) {
-            final String chat = ((SPacketChat)e.getPacket()).chatComponent.getUnformattedText();
+    public void onReceive(PacketEvent.Receive e) {
+        String chat;
+        if (e.getPacket() instanceof SPacketChat && this.ignore.getValue()) {
+            chat = ((SPacketChat) e.getPacket()).chatComponent.getUnformattedText();
             if (this.hasUnicode(chat)) {
                 e.setCancelled(true);
                 MessageUtil.sendClientMessage("<Starlink> Unicode detected, message removed!", true);
             }
         }
     }
-    
+
     @SubscribeEvent
-    public void onConnection(final ConnectionEvent event) {
-        if (this.sent.contains(event.getName())) {
-            this.sent.remove(event.getName());
-        }
+    public void onConnection(ConnectionEvent event) {
+            if (sent.contains(event.getName())) {
+                sent.remove(event.getName());
+            }
     }
-    
+
     @EventHandler
-    public void onTotemPop(final TotemPopEvent event) {
-        final EntityPlayer player = event.getEntity();
-        if (player.entityId != Starlink.mc.player.entityId && !JordoHack.INSTANCE.getFriendManager().isFriend(player) && !this.sent.contains(player.getName()) && this.timer.passedMs((long)(int)this.pop_delay.getValue()) && (boolean)this.lag.getValue() && this.isEnabled()) {
-            Starlink.mc.player.sendChatMessage("/msg " + player.getName() + " " + this.getUnicodeMessage());
+    public void onTotemPop(TotemPopEvent event) {
+        EntityPlayer player = event.getEntity();
+        if (player.entityId != mc.player.entityId && !JordoHack.INSTANCE.getFriendManager().isFriend(player) && !this.sent.contains(player.getName()) && this.timer.passedMs(this.pop_delay.getValue()) && this.lag.getValue() && this.isEnabled()) {
+            mc.player.sendChatMessage("/msg " + player.getName() + " " + this.getUnicodeMessage());
             this.sent.add(player.getName());
             this.timer.reset();
         }
-    }
-    
-    static {
-        Starlink.INSTANCE = new Starlink();
     }
 }

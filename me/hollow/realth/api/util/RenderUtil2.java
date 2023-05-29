@@ -1,12 +1,9 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.api.util;
 
-import me.hollow.realth.api.*;
+import me.hollow.realth.api.Util;
 import net.minecraft.client.*;
 import java.awt.*;
+
 import org.lwjgl.opengl.*;
 import net.minecraft.entity.*;
 import net.minecraft.util.math.*;
@@ -14,11 +11,12 @@ import net.minecraft.client.renderer.vertex.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.util.*;
 import net.minecraft.client.gui.*;
+import me.hollow.realth.api.*;
 
 public class RenderUtil2 implements Util
 {
-    public static Minecraft mc;
-    
+    public static Minecraft mc = Minecraft.getMinecraft();
+
     public static void drawCustomBB(final Color color, final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
         final AxisAlignedBB bb1 = new AxisAlignedBB(minX - RenderUtil.mc.getRenderManager().viewerPosX, minY - RenderUtil.mc.getRenderManager().viewerPosY, minZ - RenderUtil.mc.getRenderManager().viewerPosZ, maxX - RenderUtil.mc.getRenderManager().viewerPosX, maxY - RenderUtil.mc.getRenderManager().viewerPosY, maxZ - RenderUtil.mc.getRenderManager().viewerPosZ);
         GlStateManager.pushMatrix();
@@ -37,7 +35,7 @@ public class RenderUtil2 implements Util
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
-    
+
     public static void drawBoxWithHeight(final AxisAlignedBB bb, final Color color, final float height) {
         final AxisAlignedBB bb2 = new AxisAlignedBB(bb.minX - RenderUtil.mc.getRenderManager().viewerPosX, bb.minY - RenderUtil.mc.getRenderManager().viewerPosY, bb.minZ - RenderUtil.mc.getRenderManager().viewerPosZ, bb.maxX - RenderUtil.mc.getRenderManager().viewerPosX, bb.maxY - 1.0 + height - RenderUtil.mc.getRenderManager().viewerPosY, bb.maxZ - RenderUtil.mc.getRenderManager().viewerPosZ);
         GlStateManager.pushMatrix();
@@ -56,12 +54,12 @@ public class RenderUtil2 implements Util
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
-    
+
     public static void drawBlockOutlineBBWithHeight(final AxisAlignedBB bb, final Color color, final float lineWidth, final float height) {
         final Vec3d interp = interpolateEntity((Entity)RenderUtil.mc.player, RenderUtil.mc.getRenderPartialTicks());
         drawBlockOutlineWithHeight(bb.grow(0.0020000000949949026).offset(-interp.x, -interp.y, -interp.z), color, lineWidth, height);
     }
-    
+
     public static void drawBlockOutlineWithHeight(final AxisAlignedBB bb, final Color color, final float lineWidth, final float height) {
         final float red = color.getRed() / 255.0f;
         final float green = color.getGreen() / 255.0f;
@@ -103,7 +101,7 @@ public class RenderUtil2 implements Util
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
-    
+
     public static void drawBox(final AxisAlignedBB bb, final Color color) {
         final AxisAlignedBB bb2 = new AxisAlignedBB(bb.minX - RenderUtil.mc.getRenderManager().viewerPosX, bb.minY - RenderUtil.mc.getRenderManager().viewerPosY, bb.minZ - RenderUtil.mc.getRenderManager().viewerPosZ, bb.maxX - RenderUtil.mc.getRenderManager().viewerPosX, bb.maxY - RenderUtil.mc.getRenderManager().viewerPosY, bb.maxZ - RenderUtil.mc.getRenderManager().viewerPosZ);
         GlStateManager.pushMatrix();
@@ -122,12 +120,12 @@ public class RenderUtil2 implements Util
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
-    
+
     public static void drawBlockOutlineBB(final AxisAlignedBB bb, final Color color, final float lineWidth) {
         final Vec3d interpolateEntity = interpolateEntity((Entity)RenderUtil.mc.player, RenderUtil.mc.getRenderPartialTicks());
         drawBlockOutline(bb.grow(0.0020000000949949026).offset(-interpolateEntity.x, -interpolateEntity.y, -interpolateEntity.z), color, lineWidth);
     }
-    
+
     public static void drawBlockOutline(final AxisAlignedBB bb, final Color color, final float lineWidth) {
         final float red = color.getRed() / 255.0f;
         final float green = color.getGreen() / 255.0f;
@@ -169,11 +167,11 @@ public class RenderUtil2 implements Util
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
-    
+
     public static Vec3d interpolateEntity(final Entity entity, final float time) {
         return new Vec3d(entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * time, entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * time, entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * time);
     }
-    
+
     public static void drawArrow(final float x, final float y, final float size, final float widthDiv, final float heightDiv, final float outlineWidth) {
         final boolean blend = GL11.glIsEnabled(3042);
         GL11.glEnable(3042);
@@ -197,25 +195,25 @@ public class RenderUtil2 implements Util
         }
         GL11.glDisable(2848);
     }
-    
+
     public static void prepareScissor(final int x, final int y, final int width, final int height) {
         GL11.glPushMatrix();
         GL11.glPushAttrib(524288);
         scissor(x, y, x + width, y + height);
         GL11.glEnable(3089);
     }
-    
+
     public static void releaseScissor() {
         GL11.glDisable(3089);
         GL11.glPopAttrib();
         GL11.glPopMatrix();
     }
-    
+
     public static void scissor(final int x, final int y, final int x2, final int y2) {
         final ScaledResolution scaledResolution = new ScaledResolution(RenderUtil.mc);
         GL11.glScissor(x * scaledResolution.getScaleFactor(), (scaledResolution.getScaledHeight() - y2) * scaledResolution.getScaleFactor(), (x2 - x) * scaledResolution.getScaleFactor(), (y2 - y) * scaledResolution.getScaleFactor());
     }
-    
+
     public static void rectangle(final float x, final float y, final float width, final float height, final int color) {
         final float alpha = (color >> 24 & 0xFF) / 255.0f;
         final float red = (color >> 16 & 0xFF) / 255.0f;
@@ -235,7 +233,7 @@ public class RenderUtil2 implements Util
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
     }
-    
+
     public static void outline(float x, float y, float width, float height, final Color color, final float lineWidth) {
         if (x < width) {
             final double i = x;
@@ -269,7 +267,7 @@ public class RenderUtil2 implements Util
         GlStateManager.disableBlend();
         GL11.glPolygonMode(1032, 6914);
     }
-    
+
     public static void image(final ResourceLocation resourceLocation, final int x, final int y, final int width, final int height) {
         GL11.glPushMatrix();
         GlStateManager.enableAlpha();
@@ -278,9 +276,5 @@ public class RenderUtil2 implements Util
         GuiScreen.drawScaledCustomSizeModalRect(x, y, 0.0f, 0.0f, width, height, width, height, (float)width, (float)height);
         GlStateManager.disableAlpha();
         GL11.glPopMatrix();
-    }
-    
-    static {
-        RenderUtil2.mc = Minecraft.getMinecraft();
     }
 }

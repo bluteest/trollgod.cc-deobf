@@ -1,142 +1,183 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\lun\Documents\Minecraft-Deobfuscator3000-1.2.3\1.12 stable mappings"!
 
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.realmsclient.gui.ChatFormatting
+ *  net.minecraft.other.renderer.GlStateManager
+ *  net.minecraft.other.renderer.RenderHelper
+ *  net.minecraft.other.renderer.culling.Frustum
+ *  net.minecraft.enchantment.Enchantment
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.item.Item
+ *  net.minecraft.item.ItemArmor
+ *  net.minecraft.item.ItemShield
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.item.ItemSword
+ *  net.minecraft.item.ItemTool
+ *  net.minecraft.nbt.NBTTagList
+ *  net.minecraft.util.text.TextFormatting
+ */
 package me.hollow.realth.client.modules.render;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import me.hollow.realth.api.mixin.mixins.render.*;
-import net.minecraft.client.renderer.culling.*;
-import net.minecraft.entity.player.*;
-import me.hollow.realth.*;
-import java.awt.*;
-import me.hollow.realth.client.modules.other.*;
-import net.minecraft.entity.*;
-import net.minecraft.client.renderer.vertex.*;
+import com.mojang.realmsclient.gui.ChatFormatting;
+import me.hollow.realth.client.modules.other.Colours;
 import net.minecraft.client.renderer.*;
-import net.minecraft.enchantment.*;
-import com.mojang.realmsclient.gui.*;
-import net.minecraft.nbt.*;
-import net.minecraft.item.*;
-import me.hollow.realth.api.util.*;
-import net.minecraft.client.network.*;
-import java.util.*;
+import java.awt.*;
+import java.util.Map;
+import java.util.Objects;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.api.mixin.mixins.render.IRenderManager;
+import me.hollow.realth.api.property.Setting;
+import me.hollow.realth.api.util.EntityUtil;
+import me.hollow.realth.api.util.RenderUtil;
+import me.hollow.realth.client.events.Render3DEvent;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemShield;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.opengl.GL11;
 
-@ModuleManifest(label = "Nametags", category = Module.Category.RENDER, listen = false)
-public class Nametags extends Module
-{
-    private final Setting<Boolean> armor;
-    private final Setting<Boolean> armorenchants;
-    private final Setting<Boolean> shortt;
-    private final Setting<Boolean> ping;
-    private final Setting<Boolean> totemPops;
-    private final Setting<Boolean> rect;
-    private final Setting<Boolean> outline;
-    private final Setting<Boolean> sneak;
-    private final Setting<Boolean> gamemode;
-    private final Setting<Float> scaling;
-    private final Setting<Float> factor;
-    private static Nametags INSTANCE;
-    private final ICamera camera;
-    private final IRenderManager renderManager;
-    
+@ModuleManifest(label="Nametags", category=Module.Category.RENDER, listen=false)
+public class Nametags
+extends Module {
+    private final Setting<Boolean> armor = register(new Setting<>("Armor", true));
+    private final Setting<Boolean> armorenchants = register(new Setting<>("Enchants", false, v -> this.armor.getValue()));
+    private final Setting<Boolean> shortt = register(new Setting<>("Short", false, v -> this.armorenchants.getValue() && this.armor.getValue()));
+    private final Setting<Boolean> ping = register(new Setting<>("Ping", true));
+    private final Setting<Boolean> totemPops = register(new Setting<>("Pops", true));
+    private final Setting<Boolean> rect = register(new Setting<>("Rect", true));
+    private final Setting<Boolean> outline = register(new Setting<>("Outline", true, v -> this.rect.getValue()));
+    private final Setting<Boolean> sneak = this.register(new Setting<Boolean>("SneakColor", false));
+    private final Setting<Boolean> gamemode = this.register(new Setting<Boolean>("Gamemode", true));
+    private final Setting<Float> scaling = register(new Setting<>("Size", 5.9f, 0.1f, 20.0f));
+    private final Setting<Float> factor = register(new Setting<>("Factor", 0.5f, 0.1f, 1.0f));
+    private static Nametags INSTANCE = new Nametags();
+
+    private final ICamera camera = new Frustum();
+    private final IRenderManager renderManager = (IRenderManager) mc.getRenderManager();
+
     public Nametags() {
-        this.armor = (Setting<Boolean>)this.register(new Setting("Armor", (Object)true));
-        this.armorenchants = (Setting<Boolean>)this.register(new Setting("Enchants", (Object)false, v -> (boolean)this.armor.getValue()));
-        this.shortt = (Setting<Boolean>)this.register(new Setting("Short", (Object)false, v -> (boolean)this.armorenchants.getValue() && (boolean)this.armor.getValue()));
-        this.ping = (Setting<Boolean>)this.register(new Setting("Ping", (Object)true));
-        this.totemPops = (Setting<Boolean>)this.register(new Setting("Pops", (Object)true));
-        this.rect = (Setting<Boolean>)this.register(new Setting("Rect", (Object)true));
-        this.outline = (Setting<Boolean>)this.register(new Setting("Outline", (Object)true, v -> (boolean)this.rect.getValue()));
-        this.sneak = (Setting<Boolean>)this.register(new Setting("SneakColor", (Object)false));
-        this.gamemode = (Setting<Boolean>)this.register(new Setting("Gamemode", (Object)true));
-        this.scaling = (Setting<Float>)this.register(new Setting("Size", (Object)5.9f, (Object)0.1f, (Object)20.0f));
-        this.factor = (Setting<Float>)this.register(new Setting("Factor", (Object)0.5f, (Object)0.1f, (Object)1.0f));
-        this.camera = (ICamera)new Frustum();
-        this.renderManager = (IRenderManager)Nametags.mc.getRenderManager();
-        Nametags.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     public static Nametags getInstance() {
-        return Nametags.INSTANCE;
+        return INSTANCE;
     }
-    
+
+    @Override
     public void onRender3D() {
-        if (Nametags.mc.getRenderViewEntity() == null) {
+        if (mc.getRenderViewEntity() == null) {
             return;
         }
-        this.camera.setPosition(Nametags.mc.getRenderViewEntity().posX, Nametags.mc.getRenderViewEntity().posY, Nametags.mc.getRenderViewEntity().posZ);
-        final float partialTicks = Nametags.mc.getRenderPartialTicks();
-        for (int size = Nametags.mc.world.playerEntities.size(), i = 0; i < size; ++i) {
-            final EntityPlayer player = Nametags.mc.world.playerEntities.get(i);
-            if (this.camera.isBoundingBoxInFrustum(player.getEntityBoundingBox()) && player != Nametags.mc.player && !player.isDead && player.getHealth() > 0.0f) {
-                final double x = interpolate(player.lastTickPosX, player.posX, partialTicks) - this.renderManager.getRenderPosX();
-                final double y = interpolate(player.lastTickPosY, player.posY, partialTicks) - this.renderManager.getRenderPosY();
-                final double z = interpolate(player.lastTickPosZ, player.posZ, partialTicks) - this.renderManager.getRenderPosZ();
-                double tempY = y;
-                tempY += (player.isSneaking() ? 0.5 : 0.7);
-                final Entity camera = Nametags.mc.getRenderViewEntity();
-                final double originalPositionX = camera.posX;
-                final double originalPositionY = camera.posY;
-                final double originalPositionZ = camera.posZ;
-                camera.posX = interpolate(camera.prevPosX, camera.posX, partialTicks);
-                camera.posY = interpolate(camera.prevPosY, camera.posY, partialTicks);
-                camera.posZ = interpolate(camera.prevPosZ, camera.posZ, partialTicks);
-                final String displayTag = this.getDisplayTag(player);
-                final double distance = camera.getDistance(x + Nametags.mc.getRenderManager().viewerPosX, y + Nametags.mc.getRenderManager().viewerPosY, z + Nametags.mc.getRenderManager().viewerPosZ);
-                final JordoHack instance = JordoHack.INSTANCE;
-                final int width = JordoHack.fontManager.getStringWidth(displayTag) >> 1;
-                double scale = (0.0018 + (float)this.scaling.getValue() * (distance * (float)this.factor.getValue())) / 1000.0;
-                if (distance <= 8.0) {
-                    scale = 0.0245;
-                }
-                GlStateManager.pushMatrix();
-                RenderHelper.enableStandardItemLighting();
-                GlStateManager.disableLighting();
-                GlStateManager.translate((float)x, (float)tempY + 1.4f, (float)z);
-                GlStateManager.rotate(-Nametags.mc.getRenderManager().playerViewY, 0.0f, 1.0f, 0.0f);
-                GlStateManager.rotate(Nametags.mc.getRenderManager().playerViewX, (Nametags.mc.gameSettings.thirdPersonView == 2) ? -1.0f : 1.0f, 0.0f, 0.0f);
-                GlStateManager.scale(-scale, -scale, scale);
-                GlStateManager.disableDepth();
-                RenderUtil.drawRect((float)(-width - 2), -10.0f, width + 2.0f, 1.5f, 0);
-                if (this.rect.getValue()) {
-                    RenderUtil.drawRect((float)(-width - 2), -10.0f, width + 2.0f, 1.5f, 1610612736);
-                    this.drawOutlineRect((float)(-width - 2), -10.0f, width + 2.0f, 1.5f, JordoHack.INSTANCE.getFriendManager().isFriend(player) ? -9633795 : Color.BLACK.getRGB());
-                }
-                if ((boolean)this.rect.getValue() && (boolean)this.outline.getValue()) {
-                    final int outlineColor = new Color((int)Colours.getInstance().red.getValue(), (int)Colours.getInstance().green.getValue(), (int)Colours.getInstance().blue.getValue()).getRGB();
-                    this.drawOutlineRect((float)(-width - 2), -10.0f, width + 2.0f, 1.5f, JordoHack.INSTANCE.getFriendManager().isFriend(player) ? -9633795 : outlineColor);
-                }
-                if (this.armor.getValue()) {
+        camera.setPosition(mc.getRenderViewEntity().posX, mc.getRenderViewEntity().posY, mc.getRenderViewEntity().posZ);
+        float partialTicks = mc.getRenderPartialTicks();
+        final int size = mc.world.playerEntities.size();
+        for (int i = 0; i < size; ++i) {
+            final EntityPlayer player = mc.world.playerEntities.get(i);
+            if (camera.isBoundingBoxInFrustum(player.getEntityBoundingBox())) {
+                if (player != mc.player && !player.isDead && player.getHealth() > 0) {
+                    final double x = interpolate(player.lastTickPosX, player.posX, partialTicks) - renderManager.getRenderPosX();
+                    final double y = interpolate(player.lastTickPosY, player.posY, partialTicks) - renderManager.getRenderPosY();
+                    final double z = interpolate(player.lastTickPosZ, player.posZ, partialTicks) - renderManager.getRenderPosZ();
+
+                    double tempY = y;
+                    tempY += player.isSneaking() ? 0.5D : 0.7D;
+                    final Entity camera = mc.getRenderViewEntity();
+                    final double originalPositionX = camera.posX;
+                    final double originalPositionY = camera.posY;
+                    final double originalPositionZ = camera.posZ;
+                    camera.posX = interpolate(camera.prevPosX, camera.posX, partialTicks);
+                    camera.posY = interpolate(camera.prevPosY, camera.posY, partialTicks);
+                    camera.posZ = interpolate(camera.prevPosZ, camera.posZ, partialTicks);
+
+                    final String displayTag = getDisplayTag(player);
+                    final double distance = camera.getDistance(x + mc.getRenderManager().viewerPosX, y + mc.getRenderManager().viewerPosY, z + mc.getRenderManager().viewerPosZ);
+                    final int width = JordoHack.INSTANCE.fontManager.getStringWidth(displayTag) >> 1; // >> 1 is the same as / 2 but way faster
+                    double scale = (0.0018 + scaling.getValue() * (distance * factor.getValue())) / 1000.0;
+
+                    if (distance <= 8) {
+                        scale = 0.0245D;
+                    }
+
                     GlStateManager.pushMatrix();
-                    int xOffset = -8;
-                    final int invsize = player.inventory.armorInventory.size();
-                    for (int j = 0; j < invsize; ++j) {
+                    RenderHelper.enableStandardItemLighting();
+                    GlStateManager.disableLighting();
+                    GlStateManager.translate((float) x, (float) tempY + 1.4F, (float) z);
+                    GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.rotate(mc.getRenderManager().playerViewX, mc.gameSettings.thirdPersonView == 2 ? -1.0F : 1.0F, 0.0F, 0.0F);
+                    GlStateManager.scale(-scale, -scale, scale);
+                    GlStateManager.disableDepth();
+                    RenderUtil.drawRect(-width - 2, -10, width + 2F, 1.5F, 0x00000000);
+
+                    if (rect.getValue()) {
+                        RenderUtil.drawRect(-width - 2, -10, width + 2F, 1.5F, 0x60000000);
+                        this.drawOutlineRect(-width - 2, -10, width + 2F, 1.5F, (JordoHack.INSTANCE.getFriendManager().isFriend(player) ? 0xFF6CFFFD : Color.BLACK.getRGB()));
+                    }
+
+                    if (rect.getValue() == true && outline.getValue()) {
+                        int outlineColor = new Color(Colours.getInstance().red.getValue(), Colours.getInstance().green.getValue(), Colours.getInstance().blue.getValue()).getRGB();
+                        this.drawOutlineRect(-width - 2, -10, width + 2F, 1.5F, (JordoHack.INSTANCE.getFriendManager().isFriend(player) ? 0xFF6CFFFD : outlineColor));
+                    }
+
+                    if (armor.getValue()) {
+                        GlStateManager.pushMatrix();
+                        int xOffset = -8;
+                        final int invsize = player.inventory.armorInventory.size();
+                        for (int j = 0; j < invsize; ++j) {
+                            xOffset -= 8;
+                        }
+
                         xOffset -= 8;
-                    }
-                    xOffset -= 8;
-                    final ItemStack renderOffhand = player.getHeldItemMainhand().copy();
-                    this.renderItemStack(renderOffhand, xOffset - 2);
-                    xOffset += 16;
-                    for (int k = invsize - 1; k > -1; --k) {
-                        this.renderItemStack(((ItemStack)player.inventory.armorInventory.get(k)).copy(), xOffset);
+                        final ItemStack renderOffhand = player.getHeldItemMainhand().copy();
+
+                        this.renderItemStack(renderOffhand, xOffset - 2);
                         xOffset += 16;
+
+                        for (int j = invsize - 1; j > -1; j--) {
+                            this.renderItemStack(player.inventory.armorInventory.get(j).copy(), xOffset);
+                            xOffset += 16;
+                        }
+
+                        this.renderItemStack(player.getHeldItemOffhand().copy(), xOffset);
+
+                        GlStateManager.popMatrix();
                     }
-                    this.renderItemStack(player.getHeldItemOffhand().copy(), xOffset);
+
+
+                    JordoHack.fontManager.drawString(displayTag, -width, -8, this.getDisplayColour(player), false);
+
+
+                    camera.posX = originalPositionX;
+                    camera.posY = originalPositionY;
+                    camera.posZ = originalPositionZ;
+                    GlStateManager.enableDepth();
+                    GlStateManager.disableBlend();
                     GlStateManager.popMatrix();
                 }
-                JordoHack.fontManager.drawString(displayTag, (float)(-width), -8.0f, this.getDisplayColour(player));
-                camera.posX = originalPositionX;
-                camera.posY = originalPositionY;
-                camera.posZ = originalPositionZ;
-                GlStateManager.enableDepth();
-                GlStateManager.disableBlend();
-                GlStateManager.popMatrix();
             }
         }
     }
-    
+
     public void drawOutlineRect(final float x, final float y, final float w, final float h, final int color) {
         final float alpha = (color >> 24 & 0xFF) / 255.0f;
         final float red = (color >> 16 & 0xFF) / 255.0f;
@@ -149,155 +190,155 @@ public class Nametags extends Module
         GlStateManager.glLineWidth(1.4f);
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         bufferbuilder.begin(2, DefaultVertexFormats.POSITION_COLOR);
-        bufferbuilder.pos((double)x, (double)h, 0.0).color(red, green, blue, alpha).endVertex();
-        bufferbuilder.pos((double)w, (double)h, 0.0).color(red, green, blue, alpha).endVertex();
-        bufferbuilder.pos((double)w, (double)y, 0.0).color(red, green, blue, alpha).endVertex();
-        bufferbuilder.pos((double)x, (double)y, 0.0).color(red, green, blue, alpha).endVertex();
+        bufferbuilder.pos((double) x, (double) h, 0.0).color(red, green, blue, alpha).endVertex();
+        bufferbuilder.pos((double) w, (double) h, 0.0).color(red, green, blue, alpha).endVertex();
+        bufferbuilder.pos((double) w, (double) y, 0.0).color(red, green, blue, alpha).endVertex();
+        bufferbuilder.pos((double) x, (double) y, 0.0).color(red, green, blue, alpha).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
     }
-    
-    private void renderItemStack(final ItemStack stack, final int x) {
+
+    private void renderItemStack(ItemStack stack, int x) {
         GlStateManager.depthMask(true);
-        GlStateManager.clear(256);
+        GlStateManager.clear(GL11.GL_ACCUM);
+
         RenderHelper.enableStandardItemLighting();
-        Nametags.mc.getRenderItem().zLevel = -150.0f;
+        mc.getRenderItem().zLevel = -150.0F;
         GlStateManager.disableAlpha();
         GlStateManager.enableDepth();
         GlStateManager.disableCull();
-        Nametags.mc.getRenderItem().renderItemAndEffectIntoGUI(stack, x, -26);
-        Nametags.mc.getRenderItem().renderItemOverlays(Nametags.mc.fontRenderer, stack, x, -26);
-        Nametags.mc.getRenderItem().zLevel = 0.0f;
+
+        mc.getRenderItem().renderItemAndEffectIntoGUI(stack, x, -26);
+        mc.getRenderItem().renderItemOverlays(mc.fontRenderer, stack, x, -26);
+
+        mc.getRenderItem().zLevel = 0.0F;
         RenderHelper.disableStandardItemLighting();
+
         GlStateManager.enableCull();
         GlStateManager.enableAlpha();
-        GlStateManager.scale(0.5f, 0.5f, 0.5f);
+
+        GlStateManager.scale(0.5F, 0.5F, 0.5F);
         GlStateManager.disableDepth();
-        this.renderEnchantmentText(stack, x);
+        renderEnchantmentText(stack, x);
         GlStateManager.enableDepth();
-        GlStateManager.scale(2.0f, 2.0f, 2.0f);
+        GlStateManager.scale(2F, 2F, 2F);
     }
-    
-    private void renderEnchantmentText(final ItemStack stack, final int x) {
-        int enchantmentY = -34;
+
+    private void renderEnchantmentText(ItemStack stack, int x) {
+        int enchantmentY = -26 - 8;
+
         final NBTTagList enchants = stack.getEnchantmentTagList();
-        for (int tagCount = enchants.tagCount(), index = 0; index < tagCount; ++index) {
+        final int tagCount = enchants.tagCount();
+        for (int index = 0; index < tagCount; ++index) {
             final short id = enchants.getCompoundTagAt(index).getShort("id");
             final short level = enchants.getCompoundTagAt(index).getShort("lvl");
-            final Enchantment enc = Enchantment.getEnchantmentByID((int)id);
-            if ((boolean)this.armorenchants.getValue() && enc != null) {
-                if ((boolean)this.armorenchants.getValue() && (boolean)this.shortt.getValue()) {
-                    if (enc.getName().contains("fall")) {
-                        continue;
+            final Enchantment enc = Enchantment.getEnchantmentByID(id);
+            if (this.armorenchants.getValue()) {
+                if (enc != null) {
+                    if (this.armorenchants.getValue() && this.shortt.getValue()) {
+                        if (enc.getName().contains("fall") || !(enc.getName().contains("all") || enc.getName().contains("explosion")))
+                            continue;
                     }
-                    if (!enc.getName().contains("all") && !enc.getName().contains("explosion")) {
-                        continue;
-                    }
+                    JordoHack.fontManager.drawString(enc.isCurse() ? ChatFormatting.RED + enc.getTranslatedName(level).substring(11).substring(0, 2).toLowerCase() + level : enc.getTranslatedName(level).substring(0, 2).toLowerCase() + level, x * 2, enchantmentY, -1, false);
+                    enchantmentY -= 8;
                 }
-                JordoHack.fontManager.drawString(enc.isCurse() ? (ChatFormatting.RED + enc.getTranslatedName((int)level).substring(11).substring(0, 2).toLowerCase() + level) : (enc.getTranslatedName((int)level).substring(0, 2).toLowerCase() + level), (float)(x * 2), (float)enchantmentY, -1);
-                enchantmentY -= 8;
             }
         }
+
         if (hasDurability(stack)) {
             final int percent = getRoundedDamage(stack);
             String color;
-            if (percent >= 65) {
+            if(percent >= 65) {
                 color = ChatFormatting.GREEN.toString();
-            }
-            else if (percent >= 30) {
+            } else if(percent >= 30) {
                 color = ChatFormatting.YELLOW.toString();
-            }
-            else {
+            } else {
                 color = ChatFormatting.RED.toString();
             }
-            JordoHack.fontManager.drawString(color + percent + "%", (float)(x << 1), (float)enchantmentY, -1);
+            JordoHack.fontManager.drawString(color + percent + "%", x << 1 /*bit shift instead of multiplying by 2*/, enchantmentY, 0xFFFFFFFF, false);
         }
     }
-    
-    public static int getItemDamage(final ItemStack stack) {
+
+    public static int getItemDamage(ItemStack stack) {
         return stack.getMaxDamage() - stack.getItemDamage();
     }
-    
-    public static float getDamageInPercent(final ItemStack stack) {
-        return getItemDamage(stack) / (float)stack.getMaxDamage() * 100.0f;
+
+    public static float getDamageInPercent(ItemStack stack) {
+        return (getItemDamage(stack) / (float)stack.getMaxDamage()) * 100;
     }
-    
-    public static int getRoundedDamage(final ItemStack stack) {
-        return (int)getDamageInPercent(stack);
+
+    public static int getRoundedDamage(ItemStack stack) {
+        return (int) getDamageInPercent(stack);
     }
-    
-    public static boolean hasDurability(final ItemStack stack) {
+
+    public static boolean hasDurability(ItemStack stack) {
         final Item item = stack.getItem();
         return item instanceof ItemArmor || item instanceof ItemSword || item instanceof ItemTool || item instanceof ItemShield;
     }
-    
+
+
     private String getDisplayTag(final EntityPlayer player) {
         final float health = EntityUtil.getHealth(player);
         String color;
-        if (health > 18.0f) {
+
+        if (health > 18) {
             color = ChatFormatting.GREEN.toString();
-        }
-        else if (health > 16.0f) {
+        } else if (health > 16) {
             color = ChatFormatting.DARK_GREEN.toString();
-        }
-        else if (health > 12.0f) {
+        } else if (health > 12) {
             color = ChatFormatting.YELLOW.toString();
-        }
-        else if (health > 8.0f) {
+        } else if (health > 8) {
             color = ChatFormatting.GOLD.toString();
-        }
-        else if (health > 5.0f) {
+        } else if (health > 5) {
             color = ChatFormatting.RED.toString();
-        }
-        else {
+        } else {
             color = ChatFormatting.DARK_RED.toString();
         }
+
         String gamemodeStr = "";
-        if (this.gamemode.getValue()) {
+        if (gamemode.getValue()) {
             if (player.isCreative()) {
                 gamemodeStr += "[C] ";
-            }
-            else if (player.isSpectator() || player.isInvisible()) {
+            } else if (player.isSpectator() || player.isInvisible()) {
                 gamemodeStr += "[SP] ";
-            }
-            else {
+            } else {
                 gamemodeStr += "[S] ";
             }
         }
+
         String pingStr = "";
-        if (this.ping.getValue()) {
+        if (ping.getValue()) {
             try {
-                final int responseTime = Objects.requireNonNull(Nametags.mc.getConnection()).getPlayerInfo(player.getUniqueID()).getResponseTime();
-                pingStr = pingStr + responseTime + "ms";
-            }
-            catch (Exception ignored) {
+                final int responseTime = Objects.requireNonNull(mc.getConnection()).getPlayerInfo(player.getUniqueID()).getResponseTime();
+                pingStr += responseTime + "ms";
+            } catch (Exception ignored) {
                 pingStr += "-1ms";
             }
         }
+
         String popStr = "";
-        if (this.totemPops.getValue()) {
-            final Map<String, Integer> registry = (Map<String, Integer>)JordoHack.INSTANCE.getPopManager().getPopMap();
-            popStr += (registry.containsKey(player.getName()) ? (" -" + registry.get(player.getName())) : "");
+        if (totemPops.getValue()) {
+            final Map<String, Integer> registry = JordoHack.INSTANCE.getPopManager().getPopMap();
+            popStr += registry.containsKey(player.getName()) ? " -" + registry.get(player.getName()) : "";
         }
-        return player.getName() + " " + gamemodeStr + pingStr + " " + color + (int)health + ChatFormatting.RED + popStr;
+
+        return player.getName() + " " + gamemodeStr + pingStr + " " + color + (int) health + ChatFormatting.RED + popStr;
     }
-    
-    private int getDisplayColour(final EntityPlayer player) {
+
+    private int getDisplayColour (EntityPlayer player){
         if (JordoHack.INSTANCE.getFriendManager().isFriend(player)) {
-            return -9633795;
+            return 0xFF6CFFFD;
         }
-        if (player.isSneaking() && (boolean)this.sneak.getValue()) {
+        if (player.isSneaking() && this.sneak.getValue()) {
             return 3355494;
         }
-        return -1;
+        return 0xFFFFFFFF;
     }
-    
-    private static double interpolate(final double previous, final double current, final float delta) {
-        return previous + (current - previous) * delta;
-    }
-    
-    static {
-        Nametags.INSTANCE = new Nametags();
+
+    private static double interpolate ( double previous, double current, float delta){
+        return (previous + (current - previous) * delta);
     }
 }
+
+

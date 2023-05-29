@@ -1,22 +1,25 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.other.gui.GuiBossOverlay
+ */
 package me.hollow.realth.api.mixin.mixins.gui;
 
-import org.spongepowered.asm.mixin.*;
-import net.minecraft.client.gui.*;
-import org.spongepowered.asm.mixin.injection.callback.*;
-import me.hollow.realth.client.modules.render.*;
-import org.spongepowered.asm.mixin.injection.*;
+import me.hollow.realth.client.modules.render.NoRender;
+import net.minecraft.client.gui.GuiBossOverlay;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({ GuiBossOverlay.class })
-public class MixinGuiBossOverlay
-{
-    @Inject(method = { "renderBossHealth" }, at = { @At("HEAD") }, cancellable = true)
-    public void render(final CallbackInfo ci) {
-        if (NoRender.getInstance().isEnabled() && NoRender.getInstance().noBossOverlay.getValue()) {
+@Mixin(value={GuiBossOverlay.class})
+public class MixinGuiBossOverlay {
+    @Inject(method={"renderBossHealth"}, at={@At(value="HEAD")}, cancellable=true)
+    public void render(CallbackInfo ci) {
+        if (NoRender.getInstance().isEnabled() && NoRender.getInstance().noBossOverlay.getValue().booleanValue()) {
             ci.cancel();
         }
     }
 }
+

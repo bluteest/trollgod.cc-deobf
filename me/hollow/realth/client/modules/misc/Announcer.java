@@ -1,182 +1,206 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.modules.misc;
 
-import me.hollow.realth.client.modules.*;
-import me.hollow.realth.api.property.*;
-import net.minecraft.entity.player.*;
-import java.util.concurrent.*;
-import net.minecraftforge.common.*;
-import java.util.*;
-import net.b0at.api.event.*;
-import net.minecraftforge.event.entity.player.*;
-import me.hollow.realth.*;
-import net.minecraftforge.fml.common.eventhandler.*;
-import net.minecraft.network.play.client.*;
-import net.minecraft.world.*;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraft.item.*;
-import me.hollow.realth.client.events.*;
+import me.hollow.realth.JordoHack;
 import me.hollow.realth.api.util.*;
+import me.hollow.realth.client.events.*;
+import me.hollow.realth.client.modules.Module;
+import me.hollow.realth.client.modules.ModuleManifest;
+import me.hollow.realth.api.property.Setting;
+import net.b0at.api.event.EventHandler;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemAppleGold;
+import net.minecraft.network.play.client.CPacketUseEntity;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.item.ItemFood;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@ModuleManifest(label = "Announcer", category = Category.MISC, listen = true)
-public class Announcer extends Module
-{
-    public Setting<Boolean> movement;
-    public final Setting<Boolean> breakBlock;
-    public final Setting<Boolean> eat;
-    public final Setting<Boolean> custom;
-    public final Setting<String> message;
-    public final Setting<Double> delay;
-    public final Setting<Boolean> auto;
-    public final Setting<String> message2;
+
+//author lyric
+@ModuleManifest(label="Announcer", category=Module.Category.MISC, listen = true)
+public class Announcer extends Module {
+    public Setting<Boolean> movement = this.register(new Setting<Boolean>("Movement", true));
+    public final Setting<Boolean> breakBlock = this.register(new Setting<Boolean>("Break", true));
+    public final Setting<Boolean> eat = this.register(new Setting<Boolean>("Eating", true));
+    public final Setting<Boolean> custom = this.register(new Setting<Boolean>("Custom Name", false));
+    public final Setting<String> message = this.register(new Setting<Object>("Name" , "DotGod.CC" , v -> custom.getValue()));
+
+    public final Setting<Double> delay = this.register(new Setting<Double>("Delay", 10d, 1d, 30d));
+    public final Setting<Boolean> auto = this.register(new Setting<Boolean>("Auto EZ", false));
+    public final Setting<String> message2 = this.register(new Setting<Object>("Auto EZ says.." , "GG " , v -> auto.getValue()));
     private double lastPositionX;
     private double lastPositionY;
     private double lastPositionZ;
     public EntityPlayer target;
-    public int targetResetTimer;
-    public Map<EntityPlayer, Integer> targets;
-    private final Timer entityTimer;
+
+    public int targetResetTimer = 20;
+    public Map<EntityPlayer, Integer> targets = new ConcurrentHashMap<EntityPlayer, Integer>();
+
+    private final Timer entityTimer = new Timer();
+
+    @Override
+    public void onEnable()
+    {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+    @Override
+    public void onDisable()
+    {
+        MinecraftForge.EVENT_BUS.unregister(this);
+    }
+
     private int eaten;
+
     private int broken;
-    private final Timer timer;
-    
-    public Announcer() {
-        this.movement = (Setting<Boolean>)this.register(new Setting("Movement", (Object)true));
-        this.breakBlock = (Setting<Boolean>)this.register(new Setting("Break", (Object)true));
-        this.eat = (Setting<Boolean>)this.register(new Setting("Eating", (Object)true));
-        this.custom = (Setting<Boolean>)this.register(new Setting("Custom Name", (Object)false));
-        this.message = (Setting<String>)this.register(new Setting("Name", (Object)"DotGod.CC", v -> (boolean)this.custom.getValue()));
-        this.delay = (Setting<Double>)this.register(new Setting("Delay", (Object)10.0, (Object)1.0, (Object)30.0));
-        this.auto = (Setting<Boolean>)this.register(new Setting("Auto EZ", (Object)false));
-        this.message2 = (Setting<String>)this.register(new Setting("Auto EZ says..", (Object)"GG ", v -> (boolean)this.auto.getValue()));
-        this.targetResetTimer = 20;
-        this.targets = new ConcurrentHashMap<EntityPlayer, Integer>();
-        this.entityTimer = new Timer();
-        this.timer = new Timer();
-    }
-    
-    @Override
-    public void onEnable() {
-        MinecraftForge.EVENT_BUS.register((Object)this);
-    }
-    
-    @Override
-    public void onDisable() {
-        MinecraftForge.EVENT_BUS.unregister((Object)this);
-    }
-    
+
+    private final Timer timer = new Timer();
+
     @Override
     public void onToggle() {
-        this.eaten = 0;
-        this.broken = 0;
-        this.timer.reset2();
-        this.target = null;
+        eaten = 0;
+        broken = 0;
+        timer.reset2();
+        target = null;
     }
-    
     @EventHandler
-    @Override
-    public void onTick() {
-        if (fullNullCheck()) {
+    public void onTick()
+    {
+        if(fullNullCheck())
+        {
             return;
         }
-        this.targets.replaceAll((p, v) -> Integer.valueOf((int)(this.entityTimer.getPassedTimeMs() / 1000L)));
-        for (final EntityPlayer player : this.targets.keySet()) {
-            if (this.targets.get(player) <= this.targetResetTimer) {
-                continue;
-            }
+
+        this.targets.replaceAll((p, v) -> (int) (this.entityTimer.getPassedTimeMs() / 1000L));
+        for (EntityPlayer player : this.targets.keySet()) {
+            if (this.targets.get(player) <= this.targetResetTimer) continue;
             this.targets.remove(player);
             this.entityTimer.reset();
         }
     }
-    
-    @Override
-    public void onUpdate() {
-        if (fullNullCheck()) {
+
+    @EventHandler
+    public void onUpdate(UpdateWalkingPlayerEvent event) {
+        if (fullNullCheck())
+        {
             return;
         }
-        final double traveledX = this.lastPositionX - Announcer.mc.player.lastTickPosX;
-        final double traveledY = this.lastPositionY - Announcer.mc.player.lastTickPosY;
-        final double traveledZ = this.lastPositionZ - Announcer.mc.player.lastTickPosZ;
-        final double traveledDistance = Math.sqrt(traveledX * traveledX + traveledY * traveledY + traveledZ * traveledZ);
-        if ((boolean)this.movement.getValue() && traveledDistance >= 1.0 && traveledDistance <= 1000.0 && this.timer.passedS((double)this.delay.getValue())) {
-            Announcer.mc.player.sendChatMessage("I just flew " + traveledDistance + " like a butterfly thanks to TrollGod.CC!");
-            this.lastPositionX = Announcer.mc.player.lastTickPosX;
-            this.lastPositionY = Announcer.mc.player.lastTickPosY;
-            this.lastPositionZ = Announcer.mc.player.lastTickPosZ;
-            this.timer.reset2();
+
+
+        double traveledX = lastPositionX - mc.player.lastTickPosX;
+        double traveledY = lastPositionY - mc.player.lastTickPosY;
+        double traveledZ = lastPositionZ - mc.player.lastTickPosZ;
+
+        double traveledDistance = Math.sqrt(traveledX * traveledX + traveledY * traveledY + traveledZ * traveledZ);
+        int dist = ((int) traveledDistance);
+
+        if (movement.getValue() && traveledDistance >= 2 && traveledDistance <= 1000 && timer.passedS(delay.getValue())) {
+
+            if(custom.getValue())
+            {
+                mc.player.sendChatMessage("I just flew " + dist + " blocks like a butterfly thanks to " + message.getValue() + "!");
+            }
+            else {
+                mc.player.sendChatMessage("I just flew " + dist + " blocks like a butterfly thanks to TrollGod.CC!");
+            }
+
+            lastPositionX = mc.player.lastTickPosX;
+            lastPositionY = mc.player.lastTickPosY;
+            lastPositionZ = mc.player.lastTickPosZ;
+
+            timer.reset2();
         }
     }
-    
+
+
     @EventHandler
-    public void onEntityDeath(final DeathEvent event) {
-        if (fullNullCheck()) {
+    public void onEntityDeath(DeathEvent event) {
+        if(fullNullCheck())
+        {
             return;
         }
-        if ((boolean)this.auto.getValue() && this.targets.containsKey(event.player)) {
+        if (auto.getValue() && this.targets.containsKey(event.player)) {
             this.announceDeath(event.player);
-            this.timer.reset2();
+            timer.reset2();
             this.targets.remove(event.player);
         }
     }
-    
     @SubscribeEvent
-    public void onAttackEntity(final AttackEntityEvent event) {
+    public void onAttackEntity(AttackEntityEvent event) {
         if (event.getTarget() instanceof EntityPlayer && !JordoHack.INSTANCE.getFriendManager().isFriend(event.getEntityPlayer())) {
-            this.targets.put((EntityPlayer)event.getTarget(), 0);
+            this.targets.put((EntityPlayer) event.getTarget(), 0);
         }
     }
-    
+
     @EventHandler
-    public void onSendAttackPacket(final PacketEvent.Send event) {
-        final CPacketUseEntity packet;
-        if (event.getPacket() instanceof CPacketUseEntity && (packet = (CPacketUseEntity)event.getPacket()).getAction() == CPacketUseEntity.Action.ATTACK && packet.getEntityFromWorld((World)Announcer.mc.world) instanceof EntityPlayer && !JordoHack.INSTANCE.getFriendManager().isFriend((EntityPlayer)packet.getEntityFromWorld((World)Announcer.mc.world))) {
-            this.targets.put((EntityPlayer)packet.getEntityFromWorld((World)Announcer.mc.world), 0);
+    public void onSendAttackPacket(PacketEvent.Send event) {
+        CPacketUseEntity packet;
+        if (event.getPacket() instanceof CPacketUseEntity && (packet = (CPacketUseEntity) event.getPacket()).getAction() == CPacketUseEntity.Action.ATTACK && packet.getEntityFromWorld(mc.world) instanceof EntityPlayer && !JordoHack.INSTANCE.getFriendManager().isFriend((EntityPlayer) packet.getEntityFromWorld(mc.world))) {
+            this.targets.put((EntityPlayer) packet.getEntityFromWorld(mc.world), 0);
         }
     }
-    
+
+
     @SubscribeEvent
-    public void onUseItem(final LivingEntityUseItemEvent.Finish event) {
-        if (fullNullCheck()) {
+    public void onUseItem(LivingEntityUseItemEvent.Finish event) {
+        if (fullNullCheck())
+        {
             return;
         }
-        final int random = MathUtil.randomBetween(1, 6);
-        if (((boolean)this.eat.getValue() && event.getEntity() == Announcer.mc.player && event.getItem().getItem() instanceof ItemFood) || event.getItem().getItem() instanceof ItemAppleGold) {
-            ++this.eaten;
-            if (this.timer.passedS((double)this.delay.getValue()) && this.eaten >= random) {
-                if (this.custom.getValue()) {
-                    Announcer.mc.player.sendChatMessage("I just ate " + this.eaten + " " + event.getItem().getDisplayName() + " thanks to " + (String)this.message.getValue() + "!");
+        int random = MathUtil.randomBetween(1, 6);
+        if (eat.getValue()
+                && event.getEntity() == mc.player
+                && event.getItem().getItem() instanceof ItemFood
+                || event.getItem().getItem() instanceof ItemAppleGold) {
+
+            ++eaten;
+
+            if (timer.passedS(delay.getValue()) && eaten >= random) {
+                if (custom.getValue())
+                {
+                    mc.player.sendChatMessage("I just ate " + eaten + " "+ event.getItem().getDisplayName() + " thanks to " + message.getValue() + "!");
+
                 }
                 else {
-                    Announcer.mc.player.sendChatMessage("I just ate " + this.eaten + " " + event.getItem().getDisplayName() + " thanks to TrollGod.CC!");
+                    mc.player.sendChatMessage("I just ate "+ eaten + " " + event.getItem().getDisplayName() + " thanks to TrollGod.CC!");
+
                 }
-                this.eaten = 0;
-                this.timer.reset2();
+                eaten = 0;
+                timer.reset2();
             }
         }
     }
-    
+
     @EventHandler
-    public void onBreakBlock(final DamageBlockEvent event) {
-        if (fullNullCheck()) {
+    public void onBreakBlock(ClickBlockEvent event) {
+        if (fullNullCheck())
+        {
             return;
         }
-        ++this.broken;
-        if ((boolean)this.breakBlock.getValue() && this.timer.passedS((double)this.delay.getValue()) && !BlockUtil.getState(event.getPosition()).getLocalizedName().equalsIgnoreCase("BEDROCK") && !BlockUtil.getState(event.getPosition()).getLocalizedName().equalsIgnoreCase("AIR") && (BlockUtil.getState(event.getPosition()).getLocalizedName().equalsIgnoreCase("OBSIDIAN") || BlockUtil.getState(event.getPosition()).getLocalizedName().equalsIgnoreCase("ENDER_CHEST"))) {
-            if (this.custom.getValue()) {
-                Announcer.mc.player.sendChatMessage("I just broke " + this.broken + " " + BlockUtil.getState(event.getPosition()).getLocalizedName() + " thanks to " + (String)this.message.getValue() + "!");
+        ++broken;
+
+        if (breakBlock.getValue() && timer.passedS(delay.getValue()) && !(BlockUtil.getState(event.getPos()).getLocalizedName().equalsIgnoreCase("BEDROCK")) && !(BlockUtil.getState(event.getPos()).getLocalizedName().equalsIgnoreCase("AIR")) && (BlockUtil.getState(event.getPos()).getLocalizedName().equalsIgnoreCase("OBSIDIAN") || (BlockUtil.getState(event.getPos()).getLocalizedName().equalsIgnoreCase("ENDER_CHEST")))) {
+            if (custom.getValue())
+            {
+                mc.player.sendChatMessage("I just broke "+ broken +" "+ BlockUtil.getState(event.getPos()).getLocalizedName() + " thanks to " + message.getValue() +"!");
+
             }
-            else {
-                Announcer.mc.player.sendChatMessage("I just broke " + this.broken + " " + BlockUtil.getState(event.getPosition()).getLocalizedName() + " thanks to TrollGod.CC!");
+            else
+            {
+                mc.player.sendChatMessage("I just broke " + broken +" "+ BlockUtil.getState(event.getPos()).getLocalizedName() + " thanks to TrollGod.CC!");
+
             }
-            this.broken = 0;
-            this.timer.reset2();
+            broken = 0;
+
+            timer.reset2();
         }
     }
-    
-    public void announceDeath(final EntityPlayer target) {
-        Announcer.mc.player.sendChatMessage(" " + (String)this.message2.getValue() + target.getDisplayNameString() + " !");
+    public void announceDeath(EntityPlayer target) {
+        mc.player.sendChatMessage(" " + message2.getValue() + target.getDisplayNameString() + " !");
     }
+
 }

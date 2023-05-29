@@ -1,25 +1,23 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.hollow.realth.client.events;
 
-import net.b0at.api.event.*;
-import net.minecraft.util.math.*;
+import net.b0at.api.event.Event;
+import net.minecraft.util.math.BlockPos;
 
-public class BreakBlockEvent extends Event
-{
+public class BreakBlockEvent extends Event {
+
     BlockPos pos;
-    
-    public BreakBlockEvent(final BlockPos blockPos) {
-        this.pos = blockPos;
+
+    public BreakBlockEvent(BlockPos blockPos){
+        super();
+        pos = blockPos;
     }
-    
-    public BlockPos getPos() {
-        return this.pos;
+
+    public BlockPos getPos(){
+        return pos;
     }
-    
-    public void setPos(final BlockPos pos) {
+
+    public void setPos(BlockPos pos){
         this.pos = pos;
     }
 }
+

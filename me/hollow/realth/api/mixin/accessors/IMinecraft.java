@@ -1,14 +1,16 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.util.Timer
+ */
 package me.hollow.realth.api.mixin.accessors;
 
-import net.minecraft.util.*;
+import net.minecraft.util.Timer;
 
-public interface IMinecraft
-{
-    void setRightClickDelayTimer(final int p0);
-    
-    Timer getTimer();
+public interface IMinecraft {
+    public void setRightClickDelayTimer(int var1);
+
+    public Timer getTimer();
 }
+

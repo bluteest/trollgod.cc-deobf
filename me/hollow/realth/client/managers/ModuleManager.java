@@ -1,34 +1,33 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\user\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package me.hollow.realth.client.managers;
 
-import me.hollow.realth.client.modules.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import me.hollow.realth.JordoHack;
+import me.hollow.realth.client.events.KeyEvent;
+import me.hollow.realth.client.modules.Module;
 import me.hollow.realth.client.modules.other.*;
 import me.hollow.realth.client.modules.combat.*;
 import me.hollow.realth.client.modules.misc.*;
 import me.hollow.realth.client.modules.movement.*;
 import me.hollow.realth.client.modules.player.*;
 import me.hollow.realth.client.modules.render.*;
-import me.hollow.realth.*;
-import me.hollow.realth.client.events.*;
-import net.b0at.api.event.*;
+import net.b0at.api.event.EventHandler;
+import scala.tools.reflect.quasiquotes.Holes;
 
-public class ModuleManager
-{
-    private final List<Module> modules;
-    
-    public ModuleManager() {
-        this.modules = new ArrayList<Module>();
-    }
-    
+public class ModuleManager {
+    private final List<Module> modules = new ArrayList<Module>();
+
     public void init() {
+        // other
         this.register(new ClickGui());
         this.register(new Colours());
         this.register(new Blocks());
         this.register(new HUD());
+
+        // combat
         this.register(new AutoArmour());
         this.register(new Criticals());
         this.register(new HoleFiller());
@@ -36,6 +35,8 @@ public class ModuleManager
         this.register(new Offhand());
         this.register(new AutoFeetPlace());
         this.register(new WallClip());
+
+        // misc
         this.register(new Announcer());
         this.register(new AutoReply());
         this.register(new ExtraTab());
@@ -43,11 +44,15 @@ public class ModuleManager
         this.register(new MiddleClick());
         this.register(new PopCounter());
         this.register(new PvPInfo());
+
+        // movement
         this.register(new Speed());
         this.register(new Step());
         this.register(new Velocity());
         this.register(new Sprint());
         this.register(new InstantSpeed());
+
+        // player
         this.register(new AutoStackFill());
         this.register(new FakePlayer());
         this.register(new FastPlace());
@@ -55,6 +60,8 @@ public class ModuleManager
         this.register(new FastBreak());
         this.register(new AutoCity());
         this.register(new ChestSwap());
+
+        // render
         this.register(new BetterChat());
         this.register(new BlockHighlight());
         this.register(new EntityESP());
@@ -70,19 +77,19 @@ public class ModuleManager
         this.register(new Starlink());
         this.register(new ViewModel());
         this.register(new InventoryViewer());
-        JordoHack.INSTANCE.getEventManager().registerListener((Object)this);
+        JordoHack.INSTANCE.getEventManager().registerListener(this);
         this.modules.forEach(Module::onLoad);
     }
-    
+
     @EventHandler
-    public void onKey(final KeyEvent event) {
+    public void onKey(KeyEvent event) {
         this.modules.forEach(m -> {
             if (m.getKey() == event.getKey()) {
                 m.toggle();
             }
         });
     }
-    
+
     public void onRender2D() {
         this.modules.forEach(m -> {
             if (m.isEnabled()) {
@@ -90,7 +97,7 @@ public class ModuleManager
             }
         });
     }
-    
+
     public void onRender3D() {
         this.modules.forEach(m -> {
             if (m.isEnabled()) {
@@ -98,46 +105,43 @@ public class ModuleManager
             }
         });
     }
-    
-    private void register(final Module module) {
+
+    private void register(Module module) {
         this.modules.add(module);
     }
-    
+
     public final List<Module> getModules() {
         return this.modules;
     }
-    
-    public final Module getModuleByClass(final Class<?> clazz) {
+
+    public final Module getModuleByClass(Class<?> clazz) {
         Module module = null;
         for (int i = 0; i < this.modules.size(); ++i) {
-            final Module m = this.modules.get(i);
-            if (m.getClass() == clazz) {
-                module = m;
-            }
+            Module m = this.modules.get(i);
+            if (m.getClass() != clazz) continue;
+            module = m;
         }
         return module;
     }
-    
-    public final List<Module> getModulesByCategory(final Module.Category category) {
-        final ArrayList<Module> list = new ArrayList<Module>();
-        final ArrayList<Module> list2;
+
+    public final List<Module> getModulesByCategory(Module.Category category) {
+        ArrayList<Module> list = new ArrayList<Module>();
         this.modules.forEach(module -> {
-            if (module.getCategory().equals(category)) {
-                list2.add(module);
+            if (module.getCategory().equals((Object)category)) {
+                list.add((Module)module);
             }
-            return;
         });
         return list;
     }
-    
-    public final Module getModuleByLabel(final String label) {
+
+    public final Module getModuleByLabel(String label) {
         Module module = null;
         for (int i = 0; i < this.modules.size(); ++i) {
-            final Module m = this.modules.get(i);
-            if (m.getLabel().equalsIgnoreCase(label)) {
-                module = m;
-            }
+            Module m = this.modules.get(i);
+            if (!m.getLabel().equalsIgnoreCase(label)) continue;
+            module = m;
         }
         return module;
     }
 }
+
